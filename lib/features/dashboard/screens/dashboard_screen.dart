@@ -390,13 +390,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                         padding: const EdgeInsets.all(2.0), // Anillo de brillo interno
                         child: ClipOval(
                           child: Container(
-                            color: const Color(0xFF0F0F12),
+                            color: Colors.black, // Fondo negro sólido obligatorio para evitar cuadrículas transparentes
                             child: Image.asset(
-                              'assets/images/godfather_asistente.png',
+                              'assets/images/godfather_asistente.jpg', // Carga primero el JPG para evitar cuadrícula transparente del PNG
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Image.asset(
-                                  'assets/images/godfather_asistente.jpg',
+                                  'assets/images/godfather_asistente.png', // Fallback al PNG
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return const Icon(
