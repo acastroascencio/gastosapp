@@ -439,13 +439,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
                     color: GodfatherTheme.primaryGold,
-                    letterSpacing: 1,
+                    letterSpacing: 1.5,
                   ),
                 ),
                 Text(
                   'GASTO',
                   style: GoogleFonts.cinzel(
-                    fontSize: 14,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                    color: GodfatherTheme.primaryGold,
+                    letterSpacing: 1,
+                  ),
+                ),
+                Text(
+                  'U ABONO',
+                  style: GoogleFonts.cinzel(
+                    fontSize: 12,
                     fontWeight: FontWeight.w900,
                     color: GodfatherTheme.primaryGold,
                     letterSpacing: 1,
