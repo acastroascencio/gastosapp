@@ -5,7 +5,7 @@ class GodfatherTheme {
   // Colores principales
   static const Color primaryGold = Color(0xFFD4AF37); // Oro elegante
   static const Color secondaryGold = Color(0xFF996515); // Oro viejo / bronce
-  static const Color backgroundBlack = Color(0xFF0C0C0E); // Negro profundo
+  static const Color backgroundBlack = Color(0xFF0B0B0B); // Negro carbón puro (#0B0B0B)
   static const Color surfaceDark = Color(0xFF16161A); // Gris muy oscuro para tarjetas
   static const Color textLight = Color(0xFFE5E5E7); // Blanco roto
   static const Color textMuted = Color(0xFF8E8E93); // Gris para texto secundario

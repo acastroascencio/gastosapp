@@ -17,6 +17,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentTabIndex = 0; // 0: Dashboard, 1: Gastos Personales, 2: Gastos de Casa, 3: Reportes
   bool _showSelection = false; // Controla si se muestran las tarjetas GASTE/ABONE o el botón AGREGAR GASTO
   
@@ -144,9 +145,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   Widget build(BuildContext context) {
     final transactionsAsync = ref.watch(transactionProvider);
     final budgetAsync = ref.watch(budgetProvider);
-    final user = ref.watch(currentUserProvider);
 
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: transactionsAsync.maybeWhen(
+        data: (transactions) => _buildDrawer(
+          context,
+          budgetAsync.value?.limitAmount ?? 200.0,
+          transactions,
+        ),
+        orElse: () => null,
+      ),
       backgroundColor: GodfatherTheme.backgroundBlack,
       body: SafeArea(
         child: transactionsAsync.when(
@@ -221,10 +230,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
 
   // HEADER DE DISEÑO IDÉNTICO AL MOCKUP
   Widget _buildHeader(double budgetLimit, double spent) {
-    String tabTitle = 'Dashboard';
-    if (_currentTabIndex == 1) tabTitle = 'Gastos Personales';
-    if (_currentTabIndex == 2) tabTitle = 'Gastos de Casa';
-    if (_currentTabIndex == 3) tabTitle = 'Informes';
+    String tabTitle = 'DASHBOARD';
+    if (_currentTabIndex == 1) tabTitle = 'GASTOS PERSONALES';
+    if (_currentTabIndex == 2) tabTitle = 'GASTOS DE CASA';
+    if (_currentTabIndex == 3) tabTitle = 'REPORTES';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -254,23 +263,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               IconButton(
                 icon: const Icon(Icons.menu, color: GodfatherTheme.primaryGold, size: 24),
                 onPressed: () {
-                  // Mostrar diálogo o salir de cuenta
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Operaciones familiares supervisadas por Don Corleone.'),
-                      backgroundColor: GodfatherTheme.surfaceDark,
-                    ),
-                  );
+                  // Abre el Drawer lateral premium
+                  _scaffoldKey.currentState?.openDrawer();
                 },
               ),
-              // Título central "Dashboard" / "Reportes"
+              // Título central
               Text(
                 tabTitle,
                 style: GoogleFonts.cinzel(
                   fontSize: 22,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                   color: GodfatherTheme.primaryGold,
-                  letterSpacing: 1.5,
+                  letterSpacing: 2.0,
                 ),
               ),
               // Engrane de ajustes dorado
@@ -284,13 +288,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               ),
             ],
           ),
-          // Subtítulo: Caja Chica: 0/200 Soles
+          // Subtítulo nítido
           Text(
             'Caja Chica: ${spent.toStringAsFixed(0)}/${budgetLimit.toStringAsFixed(0)} Soles',
             style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: GodfatherTheme.primaryGold.withOpacity(0.9),
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: GodfatherTheme.primaryGold,
+              letterSpacing: 0.5,
             ),
           ),
         ],
@@ -324,20 +329,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
 
   // TAB 0: EL DASHBOARD CON EL AVATAR Y EL FLUJO DE INTERACCIÓN MOCKUP
   Widget _buildDashboardView(double personalExpenses, double budgetLimit) {
-    final spentPercentage = budgetLimit > 0 ? (personalExpenses / budgetLimit) : 0.0;
-    
-    // Configurar imagen del avatar según el estado de presupuesto
-    String godfatherAsset = 'assets/images/godfather_knife.png'; // Por defecto, el sticker cargado
-    if (spentPercentage > 1.0) {
-      godfatherAsset = 'assets/images/godfather_angry.png';
-    } else if (spentPercentage > 0.75) {
-      godfatherAsset = 'assets/images/godfather_worried.png';
-    }
-
     return Column(
       children: [
-        const SizedBox(height: 24),
-        // RETRATO DEL AVATAR CON THICK GOLD BORDER
+        const SizedBox(height: 36),
+        // RETRATO DEL AVATAR CON ANILLO DE ORO METÁLICO Y PULIDO
         Center(
           child: Column(
             children: [
@@ -346,33 +341,90 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 alignment: Alignment.topCenter,
                 clipBehavior: Clip.none,
                 children: [
-                  // Círculo del Retrato con borde dorado grueso (viene en la imagen jpg)
-                  SizedBox(
-                    width: 172,
-                    height: 172,
-                    child: Image.asset(
-                      'assets/images/godfather_asistente.jpg',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(
-                          Icons.person,
-                          size: 96,
-                          color: GodfatherTheme.primaryGold,
-                        );
-                      },
+                  // Anillo de oro metálico pulido y lujoso (30% más grande, 224x224)
+                  Container(
+                    width: 224,
+                    height: 224,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: GodfatherTheme.primaryGold.withOpacity(0.35),
+                          blurRadius: 18,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFF5D77F), // Oro brillante
+                          Color(0xFFD4AF37), // Oro metálico
+                          Color(0xFF996515), // Bronce/Oro viejo
+                          Color(0xFFF3E5AB), // Oro claro
+                          Color(0xFFB8860B), // Oro oscuro
+                          Color(0xFFD4AF37), // Oro metálico
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(5.0), // Grosor del anillo exterior
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: GodfatherTheme.backgroundBlack, // Borde negro carbón de separación
+                      ),
+                      padding: const EdgeInsets.all(3.0),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFF996515),
+                              Color(0xFFD4AF37),
+                              Color(0xFFF5D77F),
+                            ],
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topRight,
+                          ),
+                        ),
+                        padding: const EdgeInsets.all(2.0), // Anillo de brillo interno
+                        child: ClipOval(
+                          child: Container(
+                            color: const Color(0xFF0F0F12),
+                            child: Image.asset(
+                              'assets/images/godfather_asistente.png',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/godfather_asistente.jpg',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.person,
+                                      size: 110,
+                                      color: GodfatherTheme.primaryGold,
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   // Etiqueta superior dorada "ASISTENTE"
                   Positioned(
-                    top: -10,
+                    top: -12,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 6),
                       decoration: BoxDecoration(
                         color: GodfatherTheme.primaryGold,
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.black, width: 1.5),
                         boxShadow: const [
                           BoxShadow(
-                            color: Colors.black45,
+                            color: Colors.black54,
                             blurRadius: 4,
                             offset: Offset(0, 2),
                           ),
@@ -381,33 +433,35 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       child: Text(
                         'ASISTENTE',
                         style: GoogleFonts.inter(
-                          fontSize: 10,
+                          fontSize: 11,
                           fontWeight: FontWeight.w900,
                           color: Colors.black,
-                          letterSpacing: 1.5,
+                          letterSpacing: 2,
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 18),
               // Texto "AVATAR"
               Text(
                 'AVATAR',
                 style: GoogleFonts.cinzel(
-                  fontSize: 18,
+                  fontSize: 22,
                   fontWeight: FontWeight.w800,
                   color: GodfatherTheme.primaryGold,
-                  letterSpacing: 1.5,
+                  letterSpacing: 2.5,
                 ),
               ),
-              // Subtítulo Caja Chica
+              // Subtítulo no duplicado elegante y nítido
               Text(
-                'Caja Chica: ${personalExpenses.toStringAsFixed(0)}/${budgetLimit.toStringAsFixed(0)} Soles',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: GodfatherTheme.textLight.withOpacity(0.8),
+                'CONSEJERO DE LA FAMILIA',
+                style: GoogleFonts.cinzel(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: GodfatherTheme.textMuted,
+                  letterSpacing: 1.5,
                 ),
               ),
             ],
@@ -435,7 +489,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     );
   }
 
-  // BOTÓN INICIAL "AGREGAR GASTO" (GIANT CIRCULAR BUTTON CON DOUBLE BORDER)
+  // BOTÓN INICIAL "AGREGAR GASTO" (GIANT CIRCULAR BUTTON CON DOUBLE BORDER Y GRADIENTE METÁLICO)
   Widget _buildSingleAddButton() {
     return ScaleTransition(
       scale: _pulseAnimation,
@@ -446,55 +500,75 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           });
         },
         child: Container(
-          width: 140,
-          height: 140,
+          width: 160,
+          height: 160,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: const Color(0xFF0F0F12),
-            border: Border.all(
-              color: GodfatherTheme.primaryGold,
-              width: 3.5,
-            ),
             boxShadow: [
               BoxShadow(
-                color: GodfatherTheme.primaryGold.withOpacity(0.2),
-                blurRadius: 20,
-                spreadRadius: 2,
+                color: GodfatherTheme.primaryGold.withOpacity(0.35),
+                blurRadius: 25,
+                spreadRadius: 3,
               ),
             ],
-          ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'AGREGAR',
-                  style: GoogleFonts.cinzel(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    color: GodfatherTheme.primaryGold,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-                Text(
-                  'GASTO',
-                  style: GoogleFonts.cinzel(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                    color: GodfatherTheme.primaryGold,
-                    letterSpacing: 1,
-                  ),
-                ),
-                Text(
-                  'U ABONO',
-                  style: GoogleFonts.cinzel(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                    color: GodfatherTheme.primaryGold,
-                    letterSpacing: 1,
-                  ),
-                ),
+            gradient: const LinearGradient(
+              colors: [
+                Color(0xFFF3E5AB),
+                Color(0xFFD4AF37),
+                Color(0xFF996515),
+                Color(0xFFF5D77F),
               ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          padding: const EdgeInsets.all(4.5), // Anillo exterior
+          child: Container(
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: GodfatherTheme.backgroundBlack,
+            ),
+            padding: const EdgeInsets.all(3.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0xFF0D0D10),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'AGREGAR',
+                      style: GoogleFonts.cinzel(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: GodfatherTheme.primaryGold,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'GASTO',
+                      style: GoogleFonts.cinzel(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900,
+                        color: GodfatherTheme.primaryGold,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    Text(
+                      'U ABONO',
+                      style: GoogleFonts.cinzel(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900,
+                        color: GodfatherTheme.primaryGold,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -514,25 +588,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             _buildSelectionCard(
               title: 'GASTE',
               subtitle: 'Modo Gasto con Cuchillo',
-              assetPath: 'assets/images/godfather_knife.jpg',
+              assetPath: 'assets/images/01.png', // Sticker 01.png
               fallbackIcon: Icons.remove,
               borderColor: GodfatherTheme.alertRed,
               onTap: () => _openAddTransaction(TransactionType.gasto),
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: 24),
             // TARJETA DE ABONO ("ABONE")
             _buildSelectionCard(
               title: 'ABONE',
-              subtitle: 'Modo Abono con Mano Abierta',
-              assetPath: 'assets/images/godfather_abone.jpg',
+              subtitle: 'Modo Abono con Mano Abierta', // Sticker 02.png
+              assetPath: 'assets/images/02.png',
               fallbackIcon: Icons.add,
               borderColor: GodfatherTheme.successGreen,
               onTap: () => _openAddTransaction(TransactionType.abono),
             ),
           ],
         ),
-        const SizedBox(height: 24),
-        // BOTÓN VOLVER
+        const SizedBox(height: 36),
+        // BOTÓN VOLVER ENORME Y PERFECTAMENTE VISIBLE
         GestureDetector(
           onTap: () {
             setState(() {
@@ -540,24 +614,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             });
           },
           child: Container(
-            width: 84,
-            height: 84,
+            width: 96, // 96x96px
+            height: 96,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF0F0F12),
+              color: const Color(0xFF0B0B0B),
               border: Border.all(
-                color: GodfatherTheme.textMuted.withOpacity(0.6),
+                color: GodfatherTheme.primaryGold, // Solid Gold Border
                 width: 2.5,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: GodfatherTheme.primaryGold.withOpacity(0.18),
+                  blurRadius: 12,
+                  spreadRadius: 1,
+                ),
+              ],
             ),
             child: Center(
               child: Text(
                 'VOLVER',
                 style: GoogleFonts.cinzel(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: GodfatherTheme.textMuted,
-                  letterSpacing: 0.5,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  color: GodfatherTheme.primaryGold,
+                  letterSpacing: 1.5,
                 ),
               ),
             ),
@@ -567,7 +648,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     );
   }
 
-  // CONSTRUCTOR DE TARJETA DE SELECCIÓN
+  // CONSTRUCTOR DE TARJETA DE SELECCIÓN DE ALTA FIDELIDAD SIN ERRORES DE RECORTE
   Widget _buildSelectionCard({
     required String title,
     required String subtitle,
@@ -579,41 +660,49 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 140,
-        height: 172,
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+        width: 165, // Enlarge card width
+        height: 225, // Enlarge card height
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFF131317),
-          borderRadius: BorderRadius.circular(16),
+          color: const Color(0xFF121215), // Solid background
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: GodfatherTheme.primaryGold.withOpacity(0.7),
-            width: 1.5,
+            color: GodfatherTheme.primaryGold.withOpacity(0.85),
+            width: 1.8,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.5),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
         child: Column(
           children: [
-            // Ilustración del sticker superior
+            // Ilustración del sticker superior sin ClipOval para evitar errores de recorte
             Container(
-              width: 72,
-              height: 72,
+              width: 115,
+              height: 115,
               decoration: const BoxDecoration(
-                shape: BoxShape.circle,
+                shape: BoxShape.rectangle,
               ),
-              child: ClipOval(
-                child: Image.asset(
-                  assetPath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(fallbackIcon, size: 28, color: borderColor);
-                  },
-                ),
+              child: Image.asset(
+                assetPath,
+                fit: BoxFit.contain, // Muestra el sticker completo y nítido
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: borderColor.withOpacity(0.15),
+                      ),
+                      child: Icon(fallbackIcon, size: 36, color: borderColor),
+                    ),
+                  );
+                },
               ),
             ),
             const Spacer(),
@@ -621,21 +710,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             Text(
               title,
               style: GoogleFonts.cinzel(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w900,
                 color: GodfatherTheme.primaryGold,
-                letterSpacing: 1,
+                letterSpacing: 1.5,
               ),
             ),
-            const SizedBox(height: 4),
-            // Subtítulo descriptivo
+            const SizedBox(height: 6),
+            // Subtítulo descriptivo de alta calidad
             Text(
               subtitle,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: 9,
-                fontWeight: FontWeight.w500,
-                color: Colors.white70,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: Colors.white.withOpacity(0.9),
               ),
             ),
           ],
@@ -922,6 +1011,267 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             label: 'Reportes',
           ),
         ],
+      ),
+    );
+  }
+
+  // NAVIGATION DRAWER ULTRA-PREMIUM Noir/Gold
+  Widget _buildDrawer(BuildContext context, double budgetLimit, List<Transaction> transactions) {
+    final now = DateTime.now();
+    final personalExpenses = transactions.where((tx) {
+      return tx.targetModule == TargetModule.personal &&
+             tx.transactionType == TransactionType.gasto &&
+             tx.createdAt.month == now.month &&
+             tx.createdAt.year == now.year;
+    }).fold(0.0, (sum, tx) => sum + tx.amount);
+
+    return Drawer(
+      child: Container(
+        color: GodfatherTheme.backgroundBlack, // Puro #0B0B0B
+        child: Column(
+          children: [
+            // Drawer Header de Lujo
+            Container(
+              padding: const EdgeInsets.only(top: 60, bottom: 24, left: 20, right: 20),
+              decoration: const BoxDecoration(
+                color: Color(0xFF0D0D10),
+                border: Border(
+                  bottom: BorderSide(color: GodfatherTheme.primaryGold, width: 1.5),
+                ),
+              ),
+              child: Row(
+                children: [
+                  // Mini Avatar del Padrino
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: GodfatherTheme.primaryGold, width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: GodfatherTheme.primaryGold.withOpacity(0.2),
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/images/godfather_asistente.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/godfather_asistente.jpg',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.person, color: GodfatherTheme.primaryGold, size: 30);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'DON CORLEONE',
+                          style: GoogleFonts.cinzel(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: GodfatherTheme.primaryGold,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Consejero de Finanzas',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: GodfatherTheme.textMuted,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Caja Chica: S/. ${personalExpenses.toStringAsFixed(0)} / ${budgetLimit.toStringAsFixed(0)}',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: GodfatherTheme.primaryGold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Drawer Items
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                children: [
+                  _buildDrawerItem(
+                    icon: Icons.dashboard,
+                    title: 'DASHBOARD',
+                    isSelected: _currentTabIndex == 0,
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _currentTabIndex = 0;
+                        _showSelection = false;
+                      });
+                      _fadeController.reset();
+                      _fadeController.forward();
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.person,
+                    title: 'CAJA CHICA',
+                    subtitle: 'Gastos Personales',
+                    isSelected: _currentTabIndex == 1,
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _currentTabIndex = 1;
+                        _showSelection = false;
+                      });
+                      _fadeController.reset();
+                      _fadeController.forward();
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.home,
+                    title: 'GASTOS DE CASA',
+                    subtitle: 'Servicios de la Familia',
+                    isSelected: _currentTabIndex == 2,
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _currentTabIndex = 2;
+                        _showSelection = false;
+                      });
+                      _fadeController.reset();
+                      _fadeController.forward();
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.pie_chart,
+                    title: 'REPORTES',
+                    subtitle: 'Análisis Mensual',
+                    isSelected: _currentTabIndex == 3,
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _currentTabIndex = 3;
+                        _showSelection = false;
+                      });
+                      _fadeController.reset();
+                      _fadeController.forward();
+                    },
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Divider(color: Color(0xFF1E1E24)),
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.edit,
+                    title: 'LIMITAR CAJA CHICA',
+                    subtitle: 'Ajuste de tope familiar',
+                    isSelected: false,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showConfigureBudgetDialog(budgetLimit);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            
+            // Bottom Sign Out
+            Container(
+              padding: const EdgeInsets.all(24.0),
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Color(0xFF1E1E24), width: 1),
+                ),
+              ),
+              child: SafeArea(
+                top: false,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: GodfatherTheme.primaryGold,
+                    foregroundColor: GodfatherTheme.backgroundBlack,
+                    minimumSize: const Size.fromHeight(50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: const Icon(Icons.logout, size: 20),
+                  label: Text(
+                    'CERRAR SESIÓN',
+                    style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, letterSpacing: 1),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    final client = ref.read(supabaseClientProvider);
+                    await client.auth.signOut();
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: isSelected ? GodfatherTheme.primaryGold.withOpacity(0.08) : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        border: isSelected ? Border.all(color: GodfatherTheme.primaryGold.withOpacity(0.3), width: 1) : null,
+      ),
+      child: ListTile(
+        onTap: onTap,
+        leading: Icon(
+          icon,
+          color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textMuted,
+          size: 22,
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.cinzel(
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+            color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textLight,
+            letterSpacing: 1,
+          ),
+        ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle,
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  color: GodfatherTheme.textMuted,
+                ),
+              )
+            : null,
+        trailing: isSelected
+            ? const Icon(Icons.chevron_right, color: GodfatherTheme.primaryGold, size: 16)
+            : null,
       ),
     );
   }
