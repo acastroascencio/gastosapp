@@ -341,74 +341,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         Center(
           child: Column(
             children: [
-              // Contenedor del retrato con etiqueta "ASISTENTE"
-              Stack(
-                alignment: Alignment.topCenter,
-                clipBehavior: Clip.none,
-                children: [
-                  // Círculo del Retrato con borde dorado grueso
-                  Container(
-                    width: 172,
-                    height: 172,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color(0xFF131317),
-                      border: Border.all(
-                        color: GodfatherTheme.primaryGold,
-                        width: 3.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: GodfatherTheme.primaryGold.withOpacity(0.18),
-                          blurRadius: 28,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        godfatherAsset,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(
-                            Icons.person,
-                            size: 84,
-                            color: GodfatherTheme.primaryGold,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  // Etiqueta superior dorada "ASISTENTE"
-                  Positioned(
-                    top: -10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: GodfatherTheme.primaryGold,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black45,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        'ASISTENTE',
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.black,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              // Círculo del Retrato con borde dorado grueso y etiqueta pre-renderizada
+              SizedBox(
+                width: 280,
+                height: 180,
+                child: Image.asset(
+                  'assets/images/godfather_asistente.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(
+                      Icons.person,
+                      size: 96,
+                      color: GodfatherTheme.primaryGold,
+                    );
+                  },
+                ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 10),
               // Texto "AVATAR"
               Text(
                 'AVATAR',
