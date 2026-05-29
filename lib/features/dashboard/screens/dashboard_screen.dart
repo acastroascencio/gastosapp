@@ -301,7 +301,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   // SWITCH DE VISTAS SEGÚN EL TAB SELECCIONADO
   Widget _buildTabContent({
     required int tabIndex,
-    required List<model.Transaction> transactions,
+    required List<Transaction> transactions,
     required double personalExpenses,
     required double budgetLimit,
     required double houseIncomes,
@@ -602,7 +602,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   }
 
   // TAB 1: DETALLE DE GASTOS PERSONALES (CAJA CHICA)
-  Widget _buildPersonalExpensesView(double spent, double limit, List<model.Transaction> transactions) {
+  Widget _buildPersonalExpensesView(double spent, double limit, List<Transaction> transactions) {
     final personalTxs = transactions.where((tx) => tx.targetModule == TargetModule.personal).toList();
     final spentPercentage = limit > 0 ? (spent / limit) : 0.0;
 
@@ -714,7 +714,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   }
 
   // TAB 2: DETALLE DE GASTOS DE LA CASA
-  Widget _buildHouseExpensesView(double income, double expenses, double balance, List<model.Transaction> transactions) {
+  Widget _buildHouseExpensesView(double income, double expenses, double balance, List<Transaction> transactions) {
     final houseTxs = transactions.where((tx) => tx.targetModule == TargetModule.casa).toList();
 
     return SingleChildScrollView(
