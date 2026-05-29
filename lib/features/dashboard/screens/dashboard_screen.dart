@@ -391,22 +391,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                         child: ClipOval(
                           child: Container(
                             color: Colors.black, // Fondo negro sólido obligatorio para evitar cuadrículas transparentes
-                            child: Image.asset(
-                              'assets/images/godfather_asistente.jpg', // Carga primero el JPG para evitar cuadrícula transparente del PNG
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Image.asset(
-                                  'assets/images/godfather_asistente.png', // Fallback al PNG
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(
-                                      Icons.person,
-                                      size: 110,
-                                      color: GodfatherTheme.primaryGold,
-                                    );
-                                  },
-                                );
-                              },
+                            child: Transform.scale(
+                              scale: 1.38, // Escala 1.38x para recortar y ocultar la franja de cuadrícula transparente exterior
+                              child: Image.asset(
+                                'assets/images/godfather_asistente.jpg', // Carga primero el JPG para evitar cuadrícula transparente del PNG
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/godfather_asistente.png', // Fallback al PNG
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(
+                                        Icons.person,
+                                        size: 110,
+                                        color: GodfatherTheme.primaryGold,
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -584,9 +587,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // TARJETA DE GASTO ("GASTE")
+            // TARJETA DE GASTO ("GASTO")
             _buildSelectionCard(
-              title: 'GASTE',
+              title: 'GASTO',
               subtitle: 'Modo Gasto con Cuchillo',
               assetPath: 'assets/images/01.png', // Sticker 01.png
               fallbackIcon: Icons.remove,
@@ -682,8 +685,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           children: [
             // Ilustración del sticker superior sin ClipOval para evitar errores de recorte
             Container(
-              width: 115,
-              height: 115,
+              width: 125, // Enlarge sticker box size for premium visual fidelity
+              height: 125,
               decoration: const BoxDecoration(
                 shape: BoxShape.rectangle,
               ),
