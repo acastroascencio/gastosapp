@@ -63,7 +63,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           setState(() => _isListening = false);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error de dictado: ${val.errorString}'),
+              content: Text('Error de dictado: ${val.errorMsg}'),
               backgroundColor: GodfatherTheme.alertRed,
             ),
           );
