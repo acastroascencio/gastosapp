@@ -341,23 +341,57 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         Center(
           child: Column(
             children: [
-              // Círculo del Retrato con borde dorado grueso y etiqueta pre-renderizada
-              SizedBox(
-                width: 280,
-                height: 180,
-                child: Image.asset(
-                  'assets/images/godfather_asistente.png',
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
-                      Icons.person,
-                      size: 96,
-                      color: GodfatherTheme.primaryGold,
-                    );
-                  },
-                ),
+              // Contenedor del retrato con etiqueta "ASISTENTE"
+              Stack(
+                alignment: Alignment.topCenter,
+                clipBehavior: Clip.none,
+                children: [
+                  // Círculo del Retrato con borde dorado grueso (viene en la imagen jpg)
+                  SizedBox(
+                    width: 172,
+                    height: 172,
+                    child: Image.asset(
+                      'assets/images/godfather_asistente.jpg',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.person,
+                          size: 96,
+                          color: GodfatherTheme.primaryGold,
+                        );
+                      },
+                    ),
+                  ),
+                  // Etiqueta superior dorada "ASISTENTE"
+                  Positioned(
+                    top: -10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: GodfatherTheme.primaryGold,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black45,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        'ASISTENTE',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 14),
               // Texto "AVATAR"
               Text(
                 'AVATAR',
@@ -480,7 +514,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             _buildSelectionCard(
               title: 'GASTE',
               subtitle: 'Modo Gasto con Cuchillo',
-              assetPath: 'assets/images/godfather_knife.png',
+              assetPath: 'assets/images/godfather_knife.jpg',
               fallbackIcon: Icons.remove,
               borderColor: GodfatherTheme.alertRed,
               onTap: () => _openAddTransaction(TransactionType.gasto),
@@ -490,7 +524,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             _buildSelectionCard(
               title: 'ABONE',
               subtitle: 'Modo Abono con Mano Abierta',
-              assetPath: 'assets/images/godfather_neutral.png',
+              assetPath: 'assets/images/godfather_abone.jpg',
               fallbackIcon: Icons.add,
               borderColor: GodfatherTheme.successGreen,
               onTap: () => _openAddTransaction(TransactionType.abono),
