@@ -34,12 +34,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
   Timer? _quoteTimer;
 
   final List<String> _godfatherQuotes = [
-    '“Te haré una oferta que no podrás rechazar...”',
-    '“Un hombre sin honor no es nadie, Don.”',
-    '“Maneja tus finanzas con sigilo y control.”',
-    '“La familia es lo primero. Tus cuentas también.”',
-    '“Nunca dejes que nadie sepa lo que estás gastando.”',
-    '“El respeto se gana, y la Caja Chica se cuida.”',
+    '“Te haré una oferta que no podrás rechazar...” (El Padrino I)',
+    '“Mantén cerca a tus amigos, pero aún más cerca a tus enemigos.” (El Padrino II)',
+    '“Un hombre que no pasa tiempo con su familia nunca puede ser un hombre de verdad.” (El Padrino I)',
+    '“Nunca dejes que nadie fuera de la familia sepa lo que estás pensando.” (El Padrino I)',
+    '“La salud es lo más importante, después del amor y del dinero.” (El Padrino III)',
+    '“Nunca odies a tus enemigos, afecta tu juicio.” (El Padrino I)',
+    '“Justo cuando creía que estaba fuera, ¡me vuelven a meter!” (El Padrino III)',
+    '“El poder corrompe a quienes no lo tienen.” (El Padrino III)',
   ];
 
   @override
@@ -322,7 +324,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                     'THE GODFATHER',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.displayLarge?.copyWith(
-                      fontSize: 32,
+                      fontSize: 36,
                       letterSpacing: 2,
                     ),
                   ),
@@ -333,7 +335,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: GodfatherTheme.textMuted,
                       fontStyle: FontStyle.italic,
-                      fontSize: 13,
+                      fontSize: 15,
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -459,8 +461,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        '¿Nuevo en el clan?',
-                        style: TextStyle(color: GodfatherTheme.textMuted),
+                        '¿Nuevo en la familia?',
+                        style: TextStyle(color: GodfatherTheme.textMuted, fontSize: 15),
                       ),
                       TextButton(
                         onPressed: _isLoading
@@ -476,6 +478,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                           style: TextStyle(
                             color: GodfatherTheme.primaryGold,
                             fontWeight: FontWeight.bold,
+                            fontSize: 15,
                           ),
                         ),
                       ),

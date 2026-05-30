@@ -8,6 +8,7 @@ import '../../../core/supabase_service.dart';
 import '../../../models/transaction.dart';
 import '../../transactions/widgets/add_transaction_sheet.dart';
 import '../../reports/screens/reports_screen.dart';
+import '../../auth/screens/login_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -166,11 +167,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               const Icon(Icons.manage_accounts, color: GodfatherTheme.primaryGold),
               const SizedBox(width: 10),
               Text(
-                'PERFIL DEL CLAN',
+                'PERFIL DE LA FAMILIA',
                 style: GoogleFonts.cinzel(
                   color: GodfatherTheme.primaryGold,
                   fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                  fontSize: 20, // Aumentado
                   letterSpacing: 1.5,
                 ),
               ),
@@ -411,7 +412,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               Text(
                 tabTitle,
                 style: GoogleFonts.cinzel(
-                  fontSize: 22,
+                  fontSize: 25, // Aumentado para mayor visibilidad
                   fontWeight: FontWeight.w800,
                   color: GodfatherTheme.primaryGold,
                   letterSpacing: 2.0,
@@ -428,7 +429,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           Text(
             'Caja Chica: ${spent.toStringAsFixed(0)}/${budgetLimit.toStringAsFixed(0)} Soles',
             style: GoogleFonts.inter(
-              fontSize: 13,
+              fontSize: 15, // Aumentado
               fontWeight: FontWeight.w700,
               color: GodfatherTheme.primaryGold,
               letterSpacing: 0.5,
@@ -670,7 +671,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     Text(
                       'AGREGAR',
                       style: GoogleFonts.cinzel(
-                        fontSize: 16,
+                        fontSize: 19,
                         fontWeight: FontWeight.w900,
                         color: GodfatherTheme.primaryGold,
                         letterSpacing: 2,
@@ -680,7 +681,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     Text(
                       'GASTO',
                       style: GoogleFonts.cinzel(
-                        fontSize: 13,
+                        fontSize: 15,
                         fontWeight: FontWeight.w900,
                         color: GodfatherTheme.primaryGold,
                         letterSpacing: 1.5,
@@ -689,7 +690,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     Text(
                       'U ABONO',
                       style: GoogleFonts.cinzel(
-                        fontSize: 13,
+                        fontSize: 15,
                         fontWeight: FontWeight.w900,
                         color: GodfatherTheme.primaryGold,
                         letterSpacing: 1.5,
@@ -725,7 +726,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             // TARJETA DE ABONO ("ABONE")
             _buildSelectionCard(
               title: 'ABONE',
-              assetPath: 'assets/images/godfather_abone.png', // Caricatura del Padrino con Mano Abierta (Sticker Transparente)
+              assetPath: 'assets/images/godfather_abone.jpg', // Caricatura del Padrino con Mano Abierta
               fallbackIcon: Icons.add,
               borderColor: GodfatherTheme.successGreen,
               onTap: () => _openAddTransaction(TransactionType.abono),
@@ -786,8 +787,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 165, // Enlarge card width
-        height: 210, // Proporción áurea perfecta sin subtítulo
+        width: 180, // Enlarge card width
+        height: 235, // Proporción áurea perfecta sin subtítulo
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
         decoration: BoxDecoration(
           color: const Color(0xFF121215), // Solid background
@@ -808,8 +809,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           children: [
             // Ilustración del sticker superior sin ClipOval para evitar errores de recorte
             Container(
-              width: 125, // Enlarge sticker box size for premium visual fidelity
-              height: 125,
+              width: 150, // Enlarge sticker box size for premium visual fidelity
+              height: 150,
               decoration: const BoxDecoration(
                 shape: BoxShape.rectangle,
               ),
@@ -836,7 +837,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             Text(
               title,
               style: GoogleFonts.cinzel(
-                fontSize: 18,
+                fontSize: 21, // Aumentado
                 fontWeight: FontWeight.w900,
                 color: GodfatherTheme.primaryGold,
                 letterSpacing: 1.5,
@@ -1335,6 +1336,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     Navigator.pop(context);
                     final client = ref.read(supabaseClientProvider);
                     await client.auth.signOut();
+                    
+                    if (context.mounted) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        (route) => false,
+                      );
+                    }
                   },
                 ),
               ),

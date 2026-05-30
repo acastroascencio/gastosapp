@@ -46,7 +46,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Registro exitoso. ¡Te damos la bienvenida al clan! Accediendo...'),
+            content: Text(
+              'Registro exitoso. ¡Te damos la bienvenida a la familia Corleone! Accediendo...',
+              style: TextStyle(fontSize: 15),
+            ),
             backgroundColor: GodfatherTheme.successGreen,
           ),
         );
@@ -99,15 +102,20 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'ÚNETE AL CLAN',
+                    'ÚNETE A LA FAMILIA',
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.displayMedium,
+                    style: theme.textTheme.displayMedium?.copyWith(
+                      fontSize: 26,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Registra tus datos mínimos para iniciar la contabilidad familiar.',
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: GodfatherTheme.textMuted),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: GodfatherTheme.textMuted,
+                      fontSize: 15,
+                    ),
                   ),
                   const SizedBox(height: 40),
                   
@@ -228,8 +236,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        '¿Ya eres del clan?',
-                        style: TextStyle(color: GodfatherTheme.textMuted),
+                        '¿Ya eres de la familia?',
+                        style: TextStyle(color: GodfatherTheme.textMuted, fontSize: 15),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(context),
@@ -238,6 +246,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           style: TextStyle(
                             color: GodfatherTheme.primaryGold,
                             fontWeight: FontWeight.bold,
+                            fontSize: 15,
                           ),
                         ),
                       ),
