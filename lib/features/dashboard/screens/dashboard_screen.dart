@@ -446,25 +446,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
-              // Texto "AVATAR"
-              Text(
-                'AVATAR',
-                style: GoogleFonts.cinzel(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: GodfatherTheme.primaryGold,
-                  letterSpacing: 2.5,
-                ),
-              ),
-              // Subtítulo no duplicado elegante y nítido
+              const SizedBox(height: 14),
+              // Subtítulo no duplicado elegante y nítido en oro brillante
               Text(
                 'CONSEJERO DE LA FAMILIA',
                 style: GoogleFonts.cinzel(
-                  fontSize: 10,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: GodfatherTheme.textMuted,
-                  letterSpacing: 1.5,
+                  color: GodfatherTheme.primaryGold,
+                  letterSpacing: 2.0,
                 ),
               ),
             ],
@@ -591,7 +581,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             _buildSelectionCard(
               title: 'GASTO',
               subtitle: 'Modo Gasto con Cuchillo',
-              assetPath: 'assets/images/01.png', // Sticker 01.png
+              assetPath: 'assets/images/godfather_knife.png', // Caricatura del Padrino con Cuchillo
               fallbackIcon: Icons.remove,
               borderColor: GodfatherTheme.alertRed,
               onTap: () => _openAddTransaction(TransactionType.gasto),
@@ -600,8 +590,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             // TARJETA DE ABONO ("ABONE")
             _buildSelectionCard(
               title: 'ABONE',
-              subtitle: 'Modo Abono con Mano Abierta', // Sticker 02.png
-              assetPath: 'assets/images/02.png',
+              subtitle: 'Modo Abono con Mano Abierta', 
+              assetPath: 'assets/images/godfather_abone.jpg', // Caricatura del Padrino con Mano Abierta
               fallbackIcon: Icons.add,
               borderColor: GodfatherTheme.successGreen,
               onTap: () => _openAddTransaction(TransactionType.abono),
