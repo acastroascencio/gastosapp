@@ -580,7 +580,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             // TARJETA DE GASTO ("GASTO")
             _buildSelectionCard(
               title: 'GASTO',
-              subtitle: 'Modo Gasto con Cuchillo',
               assetPath: 'assets/images/godfather_knife.png', // Caricatura del Padrino con Cuchillo
               fallbackIcon: Icons.remove,
               borderColor: GodfatherTheme.alertRed,
@@ -590,8 +589,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             // TARJETA DE ABONO ("ABONE")
             _buildSelectionCard(
               title: 'ABONE',
-              subtitle: 'Modo Abono con Mano Abierta', 
-              assetPath: 'assets/images/godfather_abone.jpg', // Caricatura del Padrino con Mano Abierta
+              assetPath: 'assets/images/godfather_abone.png', // Caricatura del Padrino con Mano Abierta (Sticker Transparente)
               fallbackIcon: Icons.add,
               borderColor: GodfatherTheme.successGreen,
               onTap: () => _openAddTransaction(TransactionType.abono),
@@ -641,10 +639,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     );
   }
 
-  // CONSTRUCTOR DE TARJETA DE SELECCIÓN DE ALTA FIDELIDAD SIN ERRORES DE RECORTE
+  // CONSTRUCTOR DE TARJETA DE SELECCIÓN DE ALTA FIDELIDAD SIN ERRORES DE RECORTE Y SIN SUBTÍTULOS SECUNDARIOS
   Widget _buildSelectionCard({
     required String title,
-    required String subtitle,
     required String assetPath,
     required IconData fallbackIcon,
     required Color borderColor,
@@ -654,7 +651,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
       onTap: onTap,
       child: Container(
         width: 165, // Enlarge card width
-        height: 225, // Enlarge card height
+        height: 210, // Proporción áurea perfecta sin subtítulo
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
         decoration: BoxDecoration(
           color: const Color(0xFF121215), // Solid background
@@ -699,7 +696,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               ),
             ),
             const Spacer(),
-            // Título "GASTE" / "ABONE"
+            // Título "GASTO" / "ABONE"
             Text(
               title,
               style: GoogleFonts.cinzel(
@@ -707,17 +704,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 fontWeight: FontWeight.w900,
                 color: GodfatherTheme.primaryGold,
                 letterSpacing: 1.5,
-              ),
-            ),
-            const SizedBox(height: 6),
-            // Subtítulo descriptivo de alta calidad
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                color: Colors.white.withOpacity(0.9),
               ),
             ),
           ],
