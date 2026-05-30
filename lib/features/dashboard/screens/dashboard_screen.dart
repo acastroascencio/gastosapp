@@ -30,6 +30,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   // Timer para la hora en tiempo real del header
   late Timer _timer;
   String _currentTimeString = '';
+  String _localBypassName = 'DON CORLEONE';
 
   @override
   void initState() {
@@ -141,6 +142,138 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     );
   }
 
+  void _showEditProfileDialog() {
+    final profileAsync = ref.read(profileProvider);
+    final user = ref.read(currentUserProvider);
+    
+    // Si no hay sesión o perfil, usaremos valores simulados para bypass
+    final currentName = profileAsync.value?.fullName ?? _localBypassName;
+    final currentEmail = profileAsync.value?.email ?? user?.email ?? 'invitado@corleone.com';
+    
+    final nameController = TextEditingController(text: currentName);
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: GodfatherTheme.surfaceDark,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: GodfatherTheme.primaryGold, width: 1.5),
+          ),
+          title: Row(
+            children: [
+              const Icon(Icons.manage_accounts, color: GodfatherTheme.primaryGold),
+              const SizedBox(width: 10),
+              Text(
+                'PERFIL DEL CLAN',
+                style: GoogleFonts.cinzel(
+                  color: GodfatherTheme.primaryGold,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Edita los datos del consejero. Recuerda mantener tus finanzas bajo estricto honor.',
+                style: TextStyle(color: GodfatherTheme.textMuted, fontSize: 13),
+              ),
+              const SizedBox(height: 20),
+              
+              // Campo Nombre Completo
+              TextField(
+                controller: nameController,
+                style: const TextStyle(color: GodfatherTheme.textLight),
+                decoration: const InputDecoration(
+                  labelText: 'Nombre Completo',
+                  prefixIcon: Icon(Icons.person_outline, color: GodfatherTheme.primaryGold),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Campo Correo Electrónico (Solo Lectura)
+              TextField(
+                controller: TextEditingController(text: currentEmail),
+                enabled: false,
+                style: const TextStyle(color: GodfatherTheme.textMuted),
+                decoration: InputDecoration(
+                  labelText: 'Correo Electrónico (Fijo)',
+                  prefixIcon: const Icon(Icons.email_outlined, color: GodfatherTheme.textMuted),
+                  fillColor: const Color(0xFF131316),
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'CANCELAR',
+                style: TextStyle(color: GodfatherTheme.textMuted, fontWeight: FontWeight.bold),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final newName = nameController.text.trim();
+                if (newName.isEmpty) return;
+                
+                try {
+                  if (user != null) {
+                    // Si está autenticado con Supabase, guardar en BD
+                    await ref.read(profileProvider.notifier).updateProfile(newName);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Perfil de Supabase sincronizado con éxito, Don Corleone.'),
+                          backgroundColor: GodfatherTheme.successGreen,
+                        ),
+                      );
+                    }
+                  } else {
+                    // Modo Bypass: Simulación en caliente para desarrollo
+                    setState(() {
+                      _localBypassName = newName;
+                    });
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Perfil de desarrollador actualizado con éxito.'),
+                          backgroundColor: GodfatherTheme.primaryGold,
+                        ),
+                      );
+                    }
+                  }
+                  if (mounted) Navigator.pop(context);
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error al guardar perfil: $e'),
+                        backgroundColor: GodfatherTheme.alertRed,
+                      ),
+                    );
+                  }
+                }
+              },
+              child: const Text('GUARDAR'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final transactionsAsync = ref.watch(transactionProvider);
@@ -149,11 +282,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     return Scaffold(
       key: _scaffoldKey,
       drawer: transactionsAsync.maybeWhen(
-        data: (transactions) => _buildDrawer(
-          context,
-          budgetAsync.value?.limitAmount ?? 200.0,
-          transactions,
-        ),
+        data: (transactions) {
+          final profileVal = ref.watch(profileProvider).value;
+          final nameToShow = (profileVal?.fullName != null && profileVal!.fullName.trim().isNotEmpty)
+              ? profileVal.fullName.toUpperCase()
+              : _localBypassName.toUpperCase();
+          return _buildDrawer(
+            context,
+            budgetAsync.value?.limitAmount ?? 200.0,
+            transactions,
+            nameToShow,
+          );
+        },
         orElse: () => null,
       ),
       backgroundColor: GodfatherTheme.backgroundBlack,
@@ -280,11 +420,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               // Engrane de ajustes dorado
               IconButton(
                 icon: const Icon(Icons.settings, color: GodfatherTheme.primaryGold, size: 24),
-                onPressed: () async {
-                  // Opción de cerrar sesión
-                  final client = ref.read(supabaseClientProvider);
-                  await client.auth.signOut();
-                },
+                onPressed: _showEditProfileDialog,
               ),
             ],
           ),
@@ -995,7 +1131,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   }
 
   // NAVIGATION DRAWER ULTRA-PREMIUM Noir/Gold
-  Widget _buildDrawer(BuildContext context, double budgetLimit, List<Transaction> transactions) {
+  Widget _buildDrawer(BuildContext context, double budgetLimit, List<Transaction> transactions, String profileName) {
     final now = DateTime.now();
     final personalExpenses = transactions.where((tx) {
       return tx.targetModule == TargetModule.personal &&
@@ -1056,7 +1192,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'DON CORLEONE',
+                          profileName,
                           style: GoogleFonts.cinzel(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,

@@ -50,6 +50,22 @@ class ProfileNotifier extends StateNotifier<AsyncValue<Profile?>> {
   void clear() {
     state = const AsyncValue.data(null);
   }
+
+  Future<void> updateProfile(String fullName) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) return;
+    try {
+      await _client
+          .from('profiles')
+          .update({'full_name': fullName})
+          .eq('id', userId);
+      
+      // Recargar perfil para mantener consistencia local
+      await loadProfile(userId);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
 
 final profileProvider = StateNotifierProvider<ProfileNotifier, AsyncValue<Profile?>>((ref) {
