@@ -726,7 +726,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             // TARJETA DE ABONO ("ABONE")
             _buildSelectionCard(
               title: 'ABONE',
-              assetPath: 'assets/images/godfather_abone.jpg', // Caricatura del Padrino con Mano Abierta
+              assetPath: 'assets/images/godfather_abone.png', // Caricatura del Padrino con Mano Abierta (PNG Transparente)
               fallbackIcon: Icons.add,
               borderColor: GodfatherTheme.successGreen,
               onTap: () => _openAddTransaction(TransactionType.abono),
