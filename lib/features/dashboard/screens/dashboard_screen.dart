@@ -34,16 +34,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   String _localBypassName = 'DON CORLEONE';
 
   final List<String> _aboneImages = [
-    'assets/images/godfather_abone_01.png',
-    'assets/images/godfather_abone_02.png',
-    'assets/images/godfather_shared_05.png',
+    'assets/images/FINAL/01.png',
+    'assets/images/FINAL/02.png',
+    'assets/images/FINAL/05.png',
   ];
 
   final List<String> _gastoImages = [
-    'assets/images/godfather_gasto_03.png',
-    'assets/images/godfather_gasto_07.png',
-    'assets/images/godfather_gasto_06.png',
-    'assets/images/godfather_shared_05.png',
+    'assets/images/FINAL/03.png',
+    'assets/images/FINAL/04.png',
+    'assets/images/FINAL/06.png',
+    'assets/images/FINAL/05.png',
   ];
 
   late String _currentGastoImagePath;
@@ -826,24 +826,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   }) {
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         width: 180, // Enlarge card width
         height: 235, // Proporción áurea perfecta sin subtítulo
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-        decoration: BoxDecoration(
-          color: const Color(0xFF121215), // Solid background
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: GodfatherTheme.primaryGold.withOpacity(0.85),
-            width: 1.8,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 12,
-              offset: const Offset(0, 5),
-            ),
-          ],
+        decoration: const BoxDecoration(
+          color: Colors.transparent, // Totalmente transparente sin bordes ni sombras adicionales
         ),
         child: Column(
           children: [
