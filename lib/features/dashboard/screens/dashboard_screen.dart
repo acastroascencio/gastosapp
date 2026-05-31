@@ -744,33 +744,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     return Column(
       key: const ValueKey('selection_view'),
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // TARJETA DE GASTO ("GASTO")
-            _buildSelectionCard(
-              title: 'GASTO',
-              assetPath: _currentGastoImagePath,
-              fallbackIcon: Icons.remove,
-              borderColor: GodfatherTheme.alertRed,
-              onTap: () {
-                _changeGastoImage();
-                _openAddTransaction(TransactionType.gasto);
-              },
-            ),
-            const SizedBox(width: 24),
-            // TARJETA DE ABONO ("ABONE")
-            _buildSelectionCard(
-              title: 'ABONE',
-              assetPath: _currentAboneImagePath,
-              fallbackIcon: Icons.add,
-              borderColor: GodfatherTheme.successGreen,
-              onTap: () {
-                _changeAboneImage();
-                _openAddTransaction(TransactionType.abono);
-              },
-            ),
-          ],
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // TARJETA DE GASTO ("GASTO")
+              _buildSelectionCard(
+                title: 'GASTO',
+                assetPath: _currentGastoImagePath,
+                fallbackIcon: Icons.remove,
+                borderColor: GodfatherTheme.alertRed,
+                onTap: () {
+                  _changeGastoImage();
+                  _openAddTransaction(TransactionType.gasto);
+                },
+              ),
+              const SizedBox(width: 16),
+              // TARJETA DE ABONO ("ABONE")
+              _buildSelectionCard(
+                title: 'ABONE',
+                assetPath: _currentAboneImagePath,
+                fallbackIcon: Icons.add,
+                borderColor: GodfatherTheme.successGreen,
+                onTap: () {
+                  _changeAboneImage();
+                  _openAddTransaction(TransactionType.abono);
+                },
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 36),
         // BOTÓN VOLVER ENORME Y PERFECTAMENTE VISIBLE
@@ -827,8 +830,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        width: 220, // Enlarge card width to 220px (approx. 22% increase)
-        height: 285, // Enlarge card height to 285px to fit larger sticker comfortably
+        width: 235, // Enlarge card width to 235px (approx. 30% increase)
+        height: 320, // Enlarge card height to 320px to fit larger sticker comfortably
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
         decoration: const BoxDecoration(
           color: Colors.transparent, // Totalmente transparente sin bordes ni sombras adicionales
@@ -836,8 +839,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         child: Column(
           children: [
             Container(
-              width: 195, // Enlarge sticker box size by 30% (from 150 to 195) for giant visual impact
-              height: 195,
+              width: 230, // Enlarge sticker box size by over 50% (from 150 to 230) for giant visual impact
+              height: 230,
               decoration: const BoxDecoration(
                 shape: BoxShape.rectangle,
               ),
