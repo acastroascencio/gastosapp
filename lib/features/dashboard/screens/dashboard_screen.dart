@@ -827,17 +827,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        width: 180, // Enlarge card width
-        height: 235, // Proporción áurea perfecta sin subtítulo
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+        width: 220, // Enlarge card width to 220px (approx. 22% increase)
+        height: 285, // Enlarge card height to 285px to fit larger sticker comfortably
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
         decoration: const BoxDecoration(
           color: Colors.transparent, // Totalmente transparente sin bordes ni sombras adicionales
         ),
         child: Column(
           children: [
             Container(
-              width: 150, // Enlarge sticker box size for premium visual fidelity
-              height: 150,
+              width: 195, // Enlarge sticker box size by 30% (from 150 to 195) for giant visual impact
+              height: 195,
               decoration: const BoxDecoration(
                 shape: BoxShape.rectangle,
               ),
