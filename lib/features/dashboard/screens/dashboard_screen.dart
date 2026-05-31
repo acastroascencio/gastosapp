@@ -33,9 +33,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   String _currentTimeString = '';
   String _localBypassName = 'DON CORLEONE';
 
+  final List<String> _aboneImages = [
+    'assets/images/godfather_abone_01.jpg',
+    'assets/images/godfather_abone_02.jpg',
+    'assets/images/godfather_shared_05.jpg',
+  ];
+
+  final List<String> _gastoImages = [
+    'assets/images/godfather_gasto_03.jpg',
+    'assets/images/godfather_gasto_06.jpg',
+    'assets/images/godfather_shared_05.jpg',
+  ];
+
+  late String _currentGastoImagePath;
+  late String _currentAboneImagePath;
+
   @override
   void initState() {
     super.initState();
+    _currentGastoImagePath = _gastoImages[0];
+    _currentAboneImagePath = _aboneImages[0];
     _updateDateTime();
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateDateTime());
 
@@ -273,6 +290,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         );
       },
     );
+  }
+
+  void _changeGastoImage() {
+    final available = _gastoImages.where((img) => img != _currentGastoImagePath).toList();
+    final random = DateTime.now().millisecond % available.length;
+    setState(() {
+      _currentGastoImagePath = available[random];
+    });
+  }
+
+  void _changeAboneImage() {
+    final available = _aboneImages.where((img) => img != _currentAboneImagePath).toList();
+    final random = DateTime.now().millisecond % available.length;
+    setState(() {
+      _currentAboneImagePath = available[random];
+    });
   }
 
   @override
@@ -717,19 +750,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             // TARJETA DE GASTO ("GASTO")
             _buildSelectionCard(
               title: 'GASTO',
-              assetPath: 'assets/images/godfather_knife.png', // Caricatura del Padrino con Cuchillo
+              assetPath: _currentGastoImagePath,
               fallbackIcon: Icons.remove,
               borderColor: GodfatherTheme.alertRed,
-              onTap: () => _openAddTransaction(TransactionType.gasto),
+              onTap: () {
+                _changeGastoImage();
+                _openAddTransaction(TransactionType.gasto);
+              },
             ),
             const SizedBox(width: 24),
             // TARJETA DE ABONO ("ABONE")
             _buildSelectionCard(
               title: 'ABONE',
-              assetPath: 'assets/images/godfather_abone.png', // Caricatura del Padrino con Mano Abierta (PNG Transparente)
+              assetPath: _currentAboneImagePath,
               fallbackIcon: Icons.add,
               borderColor: GodfatherTheme.successGreen,
-              onTap: () => _openAddTransaction(TransactionType.abono),
+              onTap: () {
+                _changeAboneImage();
+                _openAddTransaction(TransactionType.abono);
+              },
             ),
           ],
         ),
