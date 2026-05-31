@@ -41,6 +41,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
 
   final List<String> _gastoImages = [
     'assets/images/godfather_gasto_03.jpg',
+    'assets/images/godfather_gasto_07.jpg',
     'assets/images/godfather_gasto_06.jpg',
     'assets/images/godfather_shared_05.jpg',
   ];
