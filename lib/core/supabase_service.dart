@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'constants.dart';
 import '../../models/profile.dart';
 import '../../models/transaction.dart' as model;
 import '../../models/budget.dart';
@@ -86,13 +85,16 @@ class TransactionNotifier extends StateNotifier<AsyncValue<List<model.Transactio
   final SupabaseClient _client;
   final String? _userId;
 
+  // A local list to hold bypass mode transactions in memory during app run
+  static final List<model.Transaction> _localBypassTransactions = [];
+
   TransactionNotifier(this._client, this._userId) : super(const AsyncValue.loading()) {
     loadTransactions();
   }
 
   Future<void> loadTransactions() async {
     if (_userId == null) {
-      state = const AsyncValue.data([]);
+      state = AsyncValue.data(List.from(_localBypassTransactions));
       return;
     }
     state = const AsyncValue.loading();
@@ -100,7 +102,7 @@ class TransactionNotifier extends StateNotifier<AsyncValue<List<model.Transactio
       final response = await _client
           .from('transactions')
           .select()
-          .eq('user_id', _userId!)
+          .eq('user_id', _userId)
           .order('created_at', ascending: false);
 
       final List<dynamic> data = response as List<dynamic>;
@@ -118,7 +120,21 @@ class TransactionNotifier extends StateNotifier<AsyncValue<List<model.Transactio
     required model.TransactionType type,
     required model.TargetModule target,
   }) async {
-    if (_userId == null) return;
+    if (_userId == null) {
+      final newTx = model.Transaction(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: 'guest-user-id',
+        amount: amount,
+        concept: concept,
+        category: category,
+        transactionType: type,
+        targetModule: target,
+        createdAt: DateTime.now(),
+      );
+      _localBypassTransactions.insert(0, newTx);
+      state = AsyncValue.data(List.from(_localBypassTransactions));
+      return;
+    }
     try {
       final newTx = {
         'user_id': _userId,
@@ -149,6 +165,9 @@ class BudgetNotifier extends StateNotifier<AsyncValue<Budget?>> {
   final SupabaseClient _client;
   final String? _userId;
 
+  // A local budget in memory during app run for bypass mode
+  static Budget? _localBypassBudget;
+
   BudgetNotifier(this._client, this._userId) : super(const AsyncValue.loading()) {
     loadBudgetForCurrentMonth();
   }
@@ -160,7 +179,7 @@ class BudgetNotifier extends StateNotifier<AsyncValue<Budget?>> {
 
   Future<void> loadBudgetForCurrentMonth() async {
     if (_userId == null) {
-      state = const AsyncValue.data(null);
+      state = AsyncValue.data(_localBypassBudget);
       return;
     }
     state = const AsyncValue.loading();
@@ -169,7 +188,7 @@ class BudgetNotifier extends StateNotifier<AsyncValue<Budget?>> {
       final response = await _client
           .from('budgets')
           .select()
-          .eq('user_id', _userId!)
+          .eq('user_id', _userId)
           .eq('month_year', currentMY)
           .maybeSingle();
 
@@ -184,7 +203,16 @@ class BudgetNotifier extends StateNotifier<AsyncValue<Budget?>> {
   }
 
   Future<void> setBudget(double limitAmount) async {
-    if (_userId == null) return;
+    if (_userId == null) {
+      _localBypassBudget = Budget(
+        id: 'bypass-budget-id',
+        userId: 'guest-user-id',
+        limitAmount: limitAmount,
+        monthYear: _getCurrentMonthYear(),
+      );
+      state = AsyncValue.data(_localBypassBudget);
+      return;
+    }
     try {
       final currentMY = _getCurrentMonthYear();
       
@@ -192,7 +220,7 @@ class BudgetNotifier extends StateNotifier<AsyncValue<Budget?>> {
       final existingResponse = await _client
           .from('budgets')
           .select('id')
-          .eq('user_id', _userId!)
+          .eq('user_id', _userId)
           .eq('month_year', currentMY)
           .maybeSingle();
 

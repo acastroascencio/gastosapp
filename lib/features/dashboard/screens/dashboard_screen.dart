@@ -854,22 +854,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               decoration: const BoxDecoration(
                 shape: BoxShape.rectangle,
               ),
-              child: Image.asset(
-                assetPath,
-                fit: BoxFit.contain, // Muestra el sticker completo y nítido
-                errorBuilder: (context, error, stackTrace) {
-                  return Center(
-                    child: Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: borderColor.withOpacity(0.15),
+              child: ColorFiltered(
+                colorFilter: const ColorFilter.matrix(<double>[
+                  1, 0, 0, 0, 0,      // Red
+                  0, 1, 0, 0, 0,      // Green
+                  0, 0, 1, 0, 0,      // Blue
+                  -5, -5, -5, 1, 14,  // Alpha = 14.0 + A - 5*(R+G+B) -> Hides white/off-white background
+                ]),
+                child: Image.asset(
+                  assetPath,
+                  fit: BoxFit.contain, // Muestra el sticker completo y nítido
+                  errorBuilder: (context, error, stackTrace) {
+                    return Center(
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: borderColor.withOpacity(0.15),
+                        ),
+                        child: Icon(fallbackIcon, size: 36, color: borderColor),
                       ),
-                      child: Icon(fallbackIcon, size: 36, color: borderColor),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
             const Spacer(),
