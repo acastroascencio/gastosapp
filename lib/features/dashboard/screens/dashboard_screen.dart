@@ -34,16 +34,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   String _localBypassName = 'DON CORLEONE';
 
   final List<String> _aboneImages = [
-    'assets/images/godfather_abone_01.jpg',
-    'assets/images/godfather_abone_02.jpg',
-    'assets/images/godfather_shared_05.jpg',
+    'assets/images/godfather_abone_01.png',
+    'assets/images/godfather_abone_02.png',
+    'assets/images/godfather_shared_05.png',
   ];
 
   final List<String> _gastoImages = [
-    'assets/images/godfather_gasto_03.jpg',
-    'assets/images/godfather_gasto_07.jpg',
-    'assets/images/godfather_gasto_06.jpg',
-    'assets/images/godfather_shared_05.jpg',
+    'assets/images/godfather_gasto_03.png',
+    'assets/images/godfather_gasto_07.png',
+    'assets/images/godfather_gasto_06.png',
+    'assets/images/godfather_shared_05.png',
   ];
 
   late String _currentGastoImagePath;
@@ -847,37 +847,28 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         ),
         child: Column(
           children: [
-            // Ilustración del sticker superior sin ClipOval para evitar errores de recorte
             Container(
               width: 150, // Enlarge sticker box size for premium visual fidelity
               height: 150,
               decoration: const BoxDecoration(
                 shape: BoxShape.rectangle,
               ),
-              child: ColorFiltered(
-                colorFilter: const ColorFilter.matrix(<double>[
-                  1, 0, 0, 0, 0,      // Red
-                  0, 1, 0, 0, 0,      // Green
-                  0, 0, 1, 0, 0,      // Blue
-                  -5, -5, -5, 1, 14,  // Alpha = 14.0 + A - 5*(R+G+B) -> Hides white/off-white background
-                ]),
-                child: Image.asset(
-                  assetPath,
-                  fit: BoxFit.contain, // Muestra el sticker completo y nítido
-                  errorBuilder: (context, error, stackTrace) {
-                    return Center(
-                      child: Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: borderColor.withOpacity(0.15),
-                        ),
-                        child: Icon(fallbackIcon, size: 36, color: borderColor),
+              child: Image.asset(
+                assetPath,
+                fit: BoxFit.contain, // Muestra el sticker completo y nítido
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: borderColor.withOpacity(0.15),
                       ),
-                    );
-                  },
-                ),
+                      child: Icon(fallbackIcon, size: 36, color: borderColor),
+                    ),
+                  );
+                },
               ),
             ),
             const Spacer(),
