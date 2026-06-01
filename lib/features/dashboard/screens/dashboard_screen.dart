@@ -106,6 +106,68 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     );
   }
 
+  IconData _getCategoryIcon(String category, TransactionType type) {
+    switch (category) {
+      case 'Internet':
+        return Icons.wifi;
+      case 'Luz':
+        return Icons.lightbulb_outline;
+      case 'Agua':
+        return Icons.water_drop;
+      case 'Seguridad':
+        return Icons.security;
+      case 'Alquiler':
+        return Icons.home;
+      case 'Mantenimiento':
+        return Icons.build;
+      case 'Gas':
+        return Icons.local_fire_department;
+      case 'Celular':
+      case 'Teléfono':
+        return Icons.phone_android;
+      case 'Streaming':
+        return Icons.tv;
+      case 'Limpieza':
+        return Icons.cleaning_services;
+      case 'Compras Casa':
+        return Icons.shopping_cart;
+      case 'Comida':
+        return Icons.restaurant;
+      case 'Transporte':
+        return Icons.directions_car;
+      case 'Salud':
+        return Icons.medical_services;
+      case 'Ocio':
+        return Icons.sports_esports;
+      case 'Educación':
+        return Icons.school;
+      case 'Ropa':
+        return Icons.checkroom;
+      case 'Mascotas':
+        return Icons.pets;
+      case 'Aporte mensual':
+        return Icons.calendar_month;
+      case 'Reembolso':
+        return Icons.replay;
+      case 'Fondo común':
+        return Icons.groups;
+      case 'Pago comp.':
+      case 'Pago compartido':
+        return Icons.share;
+      case 'Sueldo':
+        return Icons.work;
+      case 'Extra':
+        return Icons.add_circle;
+      case 'Venta':
+        return Icons.storefront;
+      case 'Otros':
+      case 'Otro':
+        return Icons.more_horiz;
+      default:
+        return type == TransactionType.gasto ? Icons.arrow_downward : Icons.arrow_upward;
+    }
+  }
+
   // Abre el selector de presupuesto mensual
   void _showConfigureBudgetDialog(double currentLimit) {
     final controller = TextEditingController(text: currentLimit.toStringAsFixed(2));
@@ -999,25 +1061,48 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 final isExpense = tx.transactionType == TransactionType.gasto;
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: Icon(
-                    isExpense ? Icons.arrow_downward : Icons.arrow_upward,
-                    color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                  leading: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _getCategoryIcon(tx.category, tx.transactionType),
+                      color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                      size: 22,
+                    ),
                   ),
-                  title: Text(tx.concept, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  subtitle: Text(tx.category, style: const TextStyle(fontSize: 11, color: GodfatherTheme.textMuted)),
+                  title: Text(
+                    tx.concept,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: GodfatherTheme.textLight,
+                    ),
+                  ),
+                  subtitle: Text(
+                    tx.category,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: GodfatherTheme.textMuted,
+                    ),
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
+                          fontSize: 16,
                           color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       IconButton(
-                        icon: const Icon(Icons.edit, size: 18, color: GodfatherTheme.primaryGold),
+                        icon: const Icon(Icons.edit, size: 20, color: GodfatherTheme.primaryGold),
                         onPressed: () => _openEditTransaction(tx),
                         constraints: const BoxConstraints(),
                         padding: EdgeInsets.zero,
@@ -1176,25 +1261,48 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 final isExpense = tx.transactionType == TransactionType.gasto;
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: Icon(
-                    isExpense ? Icons.arrow_downward : Icons.arrow_upward,
-                    color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                  leading: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _getCategoryIcon(tx.category, tx.transactionType),
+                      color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                      size: 22,
+                    ),
                   ),
-                  title: Text(tx.concept, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  subtitle: Text(tx.category, style: const TextStyle(fontSize: 11, color: GodfatherTheme.textMuted)),
+                  title: Text(
+                    tx.concept,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: GodfatherTheme.textLight,
+                    ),
+                  ),
+                  subtitle: Text(
+                    tx.category,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: GodfatherTheme.textMuted,
+                    ),
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
+                          fontSize: 16,
                           color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       IconButton(
-                        icon: const Icon(Icons.edit, size: 18, color: GodfatherTheme.primaryGold),
+                        icon: const Icon(Icons.edit, size: 20, color: GodfatherTheme.primaryGold),
                         onPressed: () => _openEditTransaction(tx),
                         constraints: const BoxConstraints(),
                         padding: EdgeInsets.zero,
