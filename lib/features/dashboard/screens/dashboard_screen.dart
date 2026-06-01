@@ -7,6 +7,7 @@ import '../../../core/theme.dart';
 import '../../../core/supabase_service.dart';
 import '../../../models/transaction.dart';
 import '../../transactions/widgets/add_transaction_sheet.dart';
+import '../../transactions/widgets/edit_transaction_sheet.dart';
 import '../../reports/screens/reports_screen.dart';
 import '../../auth/screens/login_screen.dart';
 
@@ -93,6 +94,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
       context: context,
       isScrollControlled: true,
       builder: (context) => AddTransactionSheet(defaultType: type),
+    );
+  }
+
+  void _openEditTransaction(Transaction tx) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => EditTransactionSheet(transaction: tx),
     );
   }
 
@@ -866,12 +875,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   ),
                   title: Text(tx.concept, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   subtitle: Text(tx.category, style: const TextStyle(fontSize: 11, color: GodfatherTheme.textMuted)),
-                  trailing: Text(
-                    '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                    ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 18, color: GodfatherTheme.primaryGold),
+                        onPressed: () => _openEditTransaction(tx),
+                        constraints: const BoxConstraints(),
+                        padding: EdgeInsets.zero,
+                      ),
+                    ],
                   ),
                 );
               },
@@ -984,12 +1005,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   ),
                   title: Text(tx.concept, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   subtitle: Text(tx.category, style: const TextStyle(fontSize: 11, color: GodfatherTheme.textMuted)),
-                  trailing: Text(
-                    '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                    ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 18, color: GodfatherTheme.primaryGold),
+                        onPressed: () => _openEditTransaction(tx),
+                        constraints: const BoxConstraints(),
+                        padding: EdgeInsets.zero,
+                      ),
+                    ],
                   ),
                 );
               },

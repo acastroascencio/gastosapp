@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/profile.dart';
@@ -80,6 +81,13 @@ final profileProvider = StateNotifierProvider<ProfileNotifier, AsyncValue<Profil
   return notifier;
 });
 
+class SeedItem {
+  final String concept;
+  final String category;
+  final double amount;
+  const SeedItem(this.concept, this.category, this.amount);
+}
+
 // Repositorio y Estado para Transacciones
 class TransactionNotifier extends StateNotifier<AsyncValue<List<model.Transaction>>> {
   final SupabaseClient _client;
@@ -88,12 +96,110 @@ class TransactionNotifier extends StateNotifier<AsyncValue<List<model.Transactio
   // A local list to hold bypass mode transactions in memory during app run
   static final List<model.Transaction> _localBypassTransactions = [];
 
+  static const List<SeedItem> _seedItems = [
+    SeedItem('WIN', 'Internet', 130.0),
+    SeedItem('AGUA CHORRILLOS', 'Agua', 65.3),
+    SeedItem('AGUA SURCO', 'Agua', 112.0),
+    SeedItem('LUZ CHORRILLOS', 'Luz', 141.6),
+    SeedItem('LUZ SURCO', 'Luz', 969.6),
+    SeedItem('GAS CHORRILLOS 01', 'Gas', 22.0),
+    SeedItem('GAS CHORRILLOS 02', 'Gas', 33.0),
+    SeedItem('MOVISTAR SURCO', 'Teléfono / Internet', 126.67),
+    SeedItem('SAGA', 'Compras / Crédito', 158.0),
+    SeedItem('CELULAR BRENDA', 'Celular', 29.0),
+    SeedItem('CELULAR MARIO', 'Celular', 62.0),
+    SeedItem('CELULAR DIANA', 'Celular', 43.0),
+  ];
+
   TransactionNotifier(this._client, this._userId) : super(const AsyncValue.loading()) {
     loadTransactions();
   }
 
+  Future<void> seedBypassIfNeeded() async {
+    bool hasChanges = false;
+    for (int month = 1; month <= 5; month++) {
+      final date = DateTime(2026, month, 1, 12, 0);
+      for (final item in _seedItems) {
+        final exists = _localBypassTransactions.any((tx) =>
+            tx.concept == item.concept &&
+            tx.amount == item.amount &&
+            tx.transactionType == model.TransactionType.gasto &&
+            tx.targetModule == model.TargetModule.casa &&
+            tx.createdAt.year == 2026 &&
+            tx.createdAt.month == month);
+
+        if (!exists) {
+          final newTx = model.Transaction(
+            id: 'seed-bypass-${item.concept}-$month',
+            userId: 'guest-user-id',
+            amount: item.amount,
+            concept: item.concept,
+            category: item.category,
+            transactionType: model.TransactionType.gasto,
+            targetModule: model.TargetModule.casa,
+            createdAt: date,
+          );
+          _localBypassTransactions.add(newTx);
+          hasChanges = true;
+        }
+      }
+    }
+    if (hasChanges) {
+      _localBypassTransactions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+  }
+
+  Future<void> seedSupabaseIfNeeded(List<model.Transaction> currentList) async {
+    if (_userId == null) return;
+    final List<Map<String, dynamic>> toInsert = [];
+    
+    for (int month = 1; month <= 5; month++) {
+      final date = DateTime(2026, month, 1, 12, 0);
+      for (final item in _seedItems) {
+        final exists = currentList.any((tx) =>
+            tx.concept == item.concept &&
+            tx.amount == item.amount &&
+            tx.transactionType == model.TransactionType.gasto &&
+            tx.targetModule == model.TargetModule.casa &&
+            tx.createdAt.year == 2026 &&
+            tx.createdAt.month == month);
+
+        if (!exists) {
+          toInsert.add({
+            'user_id': _userId,
+            'amount': item.amount,
+            'concept': item.concept,
+            'category': item.category,
+            'transaction_type': 'gasto',
+            'target_module': 'casa',
+            'created_at': date.toIso8601String(),
+          });
+        }
+      }
+    }
+    
+    if (toInsert.isNotEmpty) {
+      try {
+        await _client.from('transactions').insert(toInsert);
+        // Reload silently to refresh state
+        final response = await _client
+            .from('transactions')
+            .select()
+            .eq('user_id', _userId)
+            .order('created_at', ascending: false);
+
+        final List<dynamic> data = response as List<dynamic>;
+        final list = data.map((json) => model.Transaction.fromJson(json)).toList();
+        state = AsyncValue.data(list);
+      } catch (e) {
+        developer.log('Error seeding Supabase', error: e);
+      }
+    }
+  }
+
   Future<void> loadTransactions() async {
     if (_userId == null) {
+      await seedBypassIfNeeded();
       state = AsyncValue.data(List.from(_localBypassTransactions));
       return;
     }
@@ -108,6 +214,7 @@ class TransactionNotifier extends StateNotifier<AsyncValue<List<model.Transactio
       final List<dynamic> data = response as List<dynamic>;
       final list = data.map((json) => model.Transaction.fromJson(json)).toList();
       state = AsyncValue.data(list);
+      await seedSupabaseIfNeeded(list);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }
@@ -147,6 +254,52 @@ class TransactionNotifier extends StateNotifier<AsyncValue<List<model.Transactio
 
       await _client.from('transactions').insert(newTx);
       // Recargar transacciones para reflejar el cambio
+      await loadTransactions();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateTransaction({
+    required String id,
+    required double amount,
+    required String concept,
+    required String category,
+    required model.TransactionType type,
+    required model.TargetModule target,
+  }) async {
+    if (_userId == null) {
+      final index = _localBypassTransactions.indexWhere((tx) => tx.id == id);
+      if (index >= 0) {
+        final oldTx = _localBypassTransactions[index];
+        _localBypassTransactions[index] = model.Transaction(
+          id: oldTx.id,
+          userId: oldTx.userId,
+          amount: amount,
+          concept: concept,
+          category: category,
+          transactionType: type,
+          targetModule: target,
+          createdAt: oldTx.createdAt, // Keep original createdAt
+        );
+        state = AsyncValue.data(List.from(_localBypassTransactions));
+      }
+      return;
+    }
+    try {
+      final updatedData = {
+        'amount': amount,
+        'concept': concept,
+        'category': category,
+        'transaction_type': type == model.TransactionType.gasto ? 'gasto' : 'abono',
+        'target_module': target == model.TargetModule.personal ? 'personal' : 'casa',
+      };
+
+      await _client
+          .from('transactions')
+          .update(updatedData)
+          .eq('id', id);
+
       await loadTransactions();
     } catch (e) {
       rethrow;
