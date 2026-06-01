@@ -170,8 +170,8 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Reconocimiento de voz no disponible en este dispositivo.'),
+          SnackBar(
+            content: const Text('Reconocimiento de voz no disponible en este dispositivo.'),
             backgroundColor: GodfatherTheme.alertRed,
           ),
         );
@@ -320,8 +320,8 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
 
     if (_conceptController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, ingresa el concepto de la transacción.'),
+        SnackBar(
+          content: const Text('Por favor, ingresa el concepto de la transacción.'),
           backgroundColor: GodfatherTheme.alertRed,
         ),
       );
@@ -335,8 +335,8 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
 
     if (finalCategory.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, selecciona una categoría o ingresa una manualmente.'),
+        SnackBar(
+          content: const Text('Por favor, selecciona una categoría o ingresa una manualmente.'),
           backgroundColor: GodfatherTheme.alertRed,
         ),
       );
@@ -364,8 +364,8 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Cambios guardados con éxito en el libro mayor.'),
+          SnackBar(
+            content: const Text('Cambios guardados con éxito en el libro mayor.'),
             backgroundColor: GodfatherTheme.successGreen,
           ),
         );
@@ -398,7 +398,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
         Text(
           label.toUpperCase(),
           style: GoogleFonts.inter(
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.w800,
             color: GodfatherTheme.textLight.withValues(alpha: 0.85),
             letterSpacing: 1.5,
@@ -408,9 +408,9 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: const Color(0xFF131316),
+            color: GodfatherTheme.surfaceDarkAlt,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF2C2C30)),
+            border: Border.all(color: GodfatherTheme.borderColor),
           ),
           child: Row(
             children: options.map((entry) {
@@ -434,7 +434,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
                        child: Text(
                          entry.value,
                          style: GoogleFonts.inter(
-                           fontSize: 15,
+                           fontSize: 16,
                            fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
                            color: isSelected ? activeColor : GodfatherTheme.textLight.withValues(alpha: 0.7),
                            letterSpacing: 0.5,
@@ -474,11 +474,11 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 12,
-            childAspectRatio: 0.72,
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 110,
+            mainAxisExtent: 90, // Uniform 90px height
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
           ),
           itemCount: items.length,
           itemBuilder: (context, index) {
@@ -490,11 +490,11 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeInOut,
                 decoration: BoxDecoration(
-                  color: isSelected ? themeColor.withValues(alpha: 0.08) : const Color(0xFF131316),
-                  borderRadius: BorderRadius.circular(12),
+                  color: isSelected ? themeColor.withValues(alpha: 0.12) : GodfatherTheme.surfaceDarkAlt,
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isSelected ? GodfatherTheme.primaryGold : const Color(0xFF2C2C30),
-                    width: isSelected ? 1.8 : 1.0,
+                    color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.borderColor,
+                    width: isSelected ? 2.5 : 1.2,
                   ),
                   boxShadow: isSelected
                       ? [
@@ -507,32 +507,28 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
                       : null,
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Icon(
                         item.icon,
-                        color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textLight.withValues(alpha: 0.7),
-                        size: 32,
+                        color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.iconColor,
+                        size: 36,
                       ),
-                      const SizedBox(height: 8),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            item.label,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
-                              fontSize: 15,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                              color: isSelected ? GodfatherTheme.textLight : GodfatherTheme.textLight.withValues(alpha: 0.7),
-                              height: 1.1,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                      const SizedBox(height: 6),
+                      Text(
+                        item.label,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: GodfatherTheme.textLight,
+                          height: 1.1,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -558,7 +554,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF131316),
+          color: GodfatherTheme.surfaceDarkAlt,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: GodfatherTheme.primaryGold.withValues(alpha: 0.35), width: 1),
         ),
@@ -616,18 +612,21 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
     String buttonText = 'GUARDAR CAMBIOS';
     Color buttonColor = themeColor;
 
-    return Container(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-        left: 24,
-        right: 24,
-        top: 16,
-      ),
-      child: SingleChildScrollView(
+    final isDesktop = MediaQuery.of(context).size.width > 900;
+    final modalWidth = isDesktop ? 650.0 : double.infinity;
+
+    return Center(
+      child: Container(
+        width: modalWidth,
+        height: MediaQuery.of(context).size.height * 0.88,
+        decoration: BoxDecoration(
+          color: GodfatherTheme.surfaceDark,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Form(
           key: _formKey,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Pull Handle bar
@@ -636,7 +635,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
                   width: 48,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2C2C30),
+                    color: GodfatherTheme.borderColor,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -659,11 +658,11 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
                   GestureDetector(
                     onTap: _toggleListening,
                     child: Container(
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: _isListening
                             ? GodfatherTheme.alertRed.withValues(alpha: 0.2)
-                            : const Color(0xFF1E1E24),
+                            : GodfatherTheme.surfaceDarkAlt,
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: _isListening ? GodfatherTheme.alertRed : GodfatherTheme.primaryGold,
@@ -673,7 +672,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
                       child: Icon(
                         _isListening ? Icons.mic : Icons.mic_none,
                         color: _isListening ? GodfatherTheme.alertRed : GodfatherTheme.primaryGold,
-                        size: 28,
+                        size: 26,
                       ),
                     ),
                   ),
@@ -705,176 +704,188 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
                     ),
                   ),
                 ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // SECTION 1: Tipo de Movimiento (Gasto / Abono)
-              _buildSegmentedControl<TransactionType>(
-                label: 'Tipo de movimiento',
-                selectedValue: _type,
-                options: const [
-                  MapEntry(TransactionType.gasto, 'Gasto'),
-                  MapEntry(TransactionType.abono, 'Abono'),
-                ],
-                activeColor: themeColor,
-                onSelected: (val) {
-                  setState(() {
-                    _type = val;
-                    _target = val == TransactionType.abono ? TargetModule.casa : TargetModule.personal;
-                    _selectedCategory = '';
-                    _categoryController.clear();
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // SECTION 2: Destino / Cuenta
-              _buildSegmentedControl<TargetModule>(
-                label: 'Destino / Cuenta',
-                selectedValue: _target,
-                options: isGasto
-                    ? const [
-                        MapEntry(TargetModule.personal, 'Personal'),
-                        MapEntry(TargetModule.casa, 'Casa'),
-                      ]
-                    : const [
-                        MapEntry(TargetModule.personal, 'A mi cuenta personal'),
-                        MapEntry(TargetModule.casa, 'A gastos de casa'),
-                      ],
-                activeColor: themeColor,
-                onSelected: (val) {
-                  setState(() {
-                    _target = val;
-                    _selectedCategory = '';
-                    _categoryController.clear();
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-
-              // SECTION 3: Real-time Summary Badge
-              _buildRealTimeSummary(),
-              const SizedBox(height: 24),
-
-              // SECTION 4: Amount Input (Centered & Huge)
-              TextFormField(
-                controller: _amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textAlign: TextAlign.center,
-                style: GoogleFonts.cinzel(
-                  fontSize: 44,
-                  fontWeight: FontWeight.bold,
-                  color: isGasto ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                  letterSpacing: 2,
-                ),
-                decoration: InputDecoration(
-                  hintText: '0.00',
-                  hintStyle: TextStyle(
-                    color: GodfatherTheme.textLight.withValues(alpha: 0.15),
-                    fontSize: 44,
-                  ),
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.only(left: 16.0, right: 4.0),
-                    child: Center(
-                      widthFactor: 1,
-                      child: Text(
-                        'S/.',
-                        style: GoogleFonts.cinzel(
-                          fontSize: 30,
-                          color: GodfatherTheme.primaryGold,
-                          fontWeight: FontWeight.bold,
-                        ),
+              // SCROLLABLE FORM SECTION
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 8),
+                      // SECTION 1: Tipo de Movimiento (Gasto / Abono)
+                      _buildSegmentedControl<TransactionType>(
+                        label: 'Tipo de movimiento',
+                        selectedValue: _type,
+                        options: const [
+                          MapEntry(TransactionType.gasto, 'Gasto'),
+                          MapEntry(TransactionType.abono, 'Abono'),
+                        ],
+                        activeColor: themeColor,
+                        onSelected: (val) {
+                          setState(() {
+                            _type = val;
+                            _target = val == TransactionType.abono ? TargetModule.casa : TargetModule.personal;
+                            _selectedCategory = '';
+                            _categoryController.clear();
+                          });
+                        },
                       ),
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                  fillColor: const Color(0xFF131316),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFF2C2C30), width: 1.2),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: GodfatherTheme.primaryGold, width: 1.8),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Por favor, ingresa el monto.';
-                  }
-                  final parsed = double.tryParse(value.trim());
-                  if (parsed == null || parsed <= 0) {
-                    return 'Ingresa un monto válido mayor a 0.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-              // Concept input
-              TextFormField(
-                controller: _conceptController,
-                style: const TextStyle(color: GodfatherTheme.textLight),
-                decoration: const InputDecoration(
-                  labelText: 'Concepto (Ej. Luz, Almuerzo, Sueldo)',
-                  prefixIcon: Icon(Icons.description_outlined, color: GodfatherTheme.primaryGold),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Ingresa el concepto.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
+                      // SECTION 2: Destino / Cuenta
+                      _buildSegmentedControl<TargetModule>(
+                        label: 'Destino / Cuenta',
+                        selectedValue: _target,
+                        options: isGasto
+                            ? const [
+                                MapEntry(TargetModule.personal, 'Personal'),
+                                MapEntry(TargetModule.casa, 'Casa'),
+                              ]
+                            : const [
+                                MapEntry(TargetModule.personal, 'A mi cuenta personal'),
+                                MapEntry(TargetModule.casa, 'A gastos de casa'),
+                              ],
+                        activeColor: themeColor,
+                        onSelected: (val) {
+                          setState(() {
+                            _target = val;
+                            _selectedCategory = '';
+                            _categoryController.clear();
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
 
-              // Grid-Selector for Categories
-              _buildCategorySelector(
-                items: activeCategoryList,
-                selectedCategory: _selectedCategory,
-                themeColor: themeColor,
-                onSelected: (val) {
-                  setState(() {
-                    _selectedCategory = val;
-                    if (val != 'Otros' && val != 'Otro') {
-                      _categoryController.clear();
-                    }
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
+                      // SECTION 3: Real-time Summary Badge
+                      _buildRealTimeSummary(),
+                      const SizedBox(height: 24),
 
-              // Expandable manual Category input if 'Otros' is active
-              AnimatedSize(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeInOut,
-                child: (_selectedCategory == 'Otros' || _selectedCategory == 'Otro')
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: TextFormField(
-                          controller: _categoryController,
-                          style: const TextStyle(color: GodfatherTheme.textLight),
-                          decoration: InputDecoration(
-                            labelText: isGasto ? 'Categoría personalizada' : 'Origen del abono',
-                            prefixIcon: const Icon(Icons.category_outlined, color: GodfatherTheme.primaryGold),
-                            helperText: 'Especifica la categoría manual o concepto.',
+                      // SECTION 4: Amount Input (Centered & Huge)
+                      TextFormField(
+                        controller: _amountController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.cinzel(
+                          fontSize: 44,
+                          fontWeight: FontWeight.bold,
+                          color: isGasto ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                          letterSpacing: 2,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: '0.00',
+                          hintStyle: TextStyle(
+                            color: GodfatherTheme.textLight.withValues(alpha: 0.15),
+                            fontSize: 44,
+                          ),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.only(left: 16.0, right: 4.0),
+                            child: Center(
+                              widthFactor: 1,
+                              child: Text(
+                                'S/.',
+                                style: GoogleFonts.cinzel(
+                                  fontSize: 30,
+                                  color: GodfatherTheme.primaryGold,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                          fillColor: GodfatherTheme.surfaceDarkAlt,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide(color: GodfatherTheme.borderColor, width: 1.2),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide(color: GodfatherTheme.primaryGold, width: 1.8),
                           ),
                         ),
-                      )
-                    : const SizedBox.shrink(),
-              ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Por favor, ingresa el monto.';
+                          }
+                          final parsed = double.tryParse(value.trim());
+                          if (parsed == null || parsed <= 0) {
+                            return 'Ingresa un monto válido mayor a 0.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
 
-              // Optional Note field
-              TextFormField(
-                controller: _noteController,
-                style: const TextStyle(color: GodfatherTheme.textLight),
-                decoration: const InputDecoration(
-                  labelText: 'Nota o comentario (Opcional)',
-                  prefixIcon: Icon(Icons.rate_review_outlined, color: GodfatherTheme.primaryGold),
+                      // Concept input
+                      TextFormField(
+                        controller: _conceptController,
+                        style: TextStyle(color: GodfatherTheme.textLight),
+                        decoration: InputDecoration(
+                          labelText: 'Concepto (Ej. Luz, Almuerzo, Sueldo)',
+                          prefixIcon: Icon(Icons.description_outlined, color: GodfatherTheme.primaryGold),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Ingresa el concepto.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Grid-Selector for Categories
+                      _buildCategorySelector(
+                        items: activeCategoryList,
+                        selectedCategory: _selectedCategory,
+                        themeColor: themeColor,
+                        onSelected: (val) {
+                          setState(() {
+                            _selectedCategory = val;
+                            if (val != 'Otros' && val != 'Otro') {
+                              _categoryController.clear();
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Expandable manual Category input if 'Otros' is active
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeInOut,
+                        child: (_selectedCategory == 'Otros' || _selectedCategory == 'Otro')
+                            ? Padding(
+                                padding: const EdgeInsets.only(bottom: 16.0),
+                                child: TextFormField(
+                                  controller: _categoryController,
+                                  style: TextStyle(color: GodfatherTheme.textLight),
+                                  decoration: InputDecoration(
+                                    labelText: isGasto ? 'Categoría personalizada' : 'Origen del abono',
+                                    prefixIcon: Icon(Icons.category_outlined, color: GodfatherTheme.primaryGold),
+                                    helperText: 'Especifica la categoría manual o concepto.',
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+
+                      // Optional Note field
+                      TextFormField(
+                        controller: _noteController,
+                        style: TextStyle(color: GodfatherTheme.textLight),
+                        decoration: InputDecoration(
+                          labelText: 'Nota o comentario (Opcional)',
+                          prefixIcon: Icon(Icons.rate_review_outlined, color: GodfatherTheme.primaryGold),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 28),
 
-              // Action Buttons: GUARDAR CAMBIOS & CANCELAR
+              // FIXED BUTTON PANEL
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
@@ -886,7 +897,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
                         foregroundColor: GodfatherTheme.primaryGold,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
-                          side: const BorderSide(color: GodfatherTheme.primaryGold, width: 1.5),
+                          side: BorderSide(color: GodfatherTheme.primaryGold, width: 1.5),
                         ),
                       ),
                       child: Text(

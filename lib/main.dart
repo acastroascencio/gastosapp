@@ -33,11 +33,13 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
       title: 'The Godfather Finanzas',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.dark,
+      themeMode: themeMode,
+      theme: GodfatherTheme.lightTheme,
       darkTheme: GodfatherTheme.darkTheme,
       home: authState.when(
         data: (session) {
@@ -47,7 +49,7 @@ class MyApp extends ConsumerWidget {
             return const LoginScreen();
           }
         },
-        loading: () => const Scaffold(
+        loading: () => Scaffold(
           body: Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation(GodfatherTheme.primaryGold),
@@ -58,7 +60,7 @@ class MyApp extends ConsumerWidget {
           body: Center(
             child: Text(
               'Error en la conexión con Supabase: $error',
-              style: const TextStyle(color: GodfatherTheme.alertRed),
+              style: TextStyle(color: GodfatherTheme.alertRed),
             ),
           ),
         ),

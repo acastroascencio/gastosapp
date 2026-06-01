@@ -121,8 +121,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Acceso concedido, Don.'),
+          SnackBar(
+            content: const Text('Acceso concedido, Don.'),
             backgroundColor: GodfatherTheme.successGreen,
           ),
         );
@@ -139,8 +139,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error inesperado al iniciar sesión.'),
+          SnackBar(
+            content: const Text('Error inesperado al iniciar sesión.'),
             backgroundColor: GodfatherTheme.alertRed,
           ),
         );
@@ -153,8 +153,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
   Future<void> _recoveryPassword() async {
     if (_emailController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, ingresa tu correo para enviar el enlace de recuperación.'),
+        SnackBar(
+          content: const Text('Por favor, ingresa tu correo para enviar el enlace de recuperación.'),
           backgroundColor: GodfatherTheme.primaryGold,
         ),
       );
@@ -167,8 +167,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
       await client.auth.resetPasswordForEmail(_emailController.text.trim());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Enlace de recuperación enviado al correo registrado.'),
+          SnackBar(
+            content: const Text('Enlace de recuperación enviado al correo registrado.'),
             backgroundColor: GodfatherTheme.successGreen,
           ),
         );
@@ -263,7 +263,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: GodfatherTheme.primaryGold.withOpacity(0.35),
+                                  color: GodfatherTheme.primaryGold.withValues(alpha: 0.35),
                                   blurRadius: 16,
                                   spreadRadius: 1,
                                 ),
@@ -281,7 +281,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                             ),
                             padding: const EdgeInsets.all(4.0), // Anillo exterior
                             child: Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: GodfatherTheme.backgroundBlack,
                               ),
@@ -299,7 +299,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                                           'assets/images/godfather_asistente.png',
                                           fit: BoxFit.cover,
                                           errorBuilder: (context, error, stackTrace) {
-                                            return const Icon(
+                                            return Icon(
                                               Icons.person,
                                               size: 60,
                                               color: GodfatherTheme.primaryGold,
@@ -345,8 +345,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
-                    style: const TextStyle(color: GodfatherTheme.textLight),
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: GodfatherTheme.textLight),
+                    decoration: InputDecoration(
                       labelText: 'Correo Electrónico',
                       prefixIcon: Icon(Icons.email_outlined, color: GodfatherTheme.primaryGold),
                     ),
@@ -367,10 +367,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     textInputAction: TextInputAction.done,
-                    style: const TextStyle(color: GodfatherTheme.textLight),
+                    style: TextStyle(color: GodfatherTheme.textLight),
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
-                      prefixIcon: const Icon(Icons.lock_outlined, color: GodfatherTheme.primaryGold),
+                      prefixIcon: Icon(Icons.lock_outlined, color: GodfatherTheme.primaryGold),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -395,7 +395,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: _isLoading ? null : _recoveryPassword,
-                      child: const Text(
+                      child: Text(
                         '¿Olvidaste tu contraseña?',
                         style: TextStyle(
                           color: GodfatherTheme.primaryGold,
@@ -410,7 +410,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                   ElevatedButton(
                     onPressed: _isLoading ? null : _login,
                     child: _isLoading
-                        ? const SizedBox(
+                        ? SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
@@ -426,10 +426,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                   OutlinedButton(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Acceso Directo concedido. Ingresando en modo desarrollador.'),
+                        SnackBar(
+                          content: const Text('Acceso Directo concedido. Ingresando en modo desarrollador.'),
                           backgroundColor: GodfatherTheme.primaryGold,
-                          duration: Duration(seconds: 1),
+                          duration: const Duration(seconds: 1),
                         ),
                       );
                       Navigator.pushReplacement(
@@ -452,7 +452,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         '¿Nuevo en la familia?',
                         style: TextStyle(color: GodfatherTheme.textLight, fontSize: 17),
                       ),
@@ -465,7 +465,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                                   MaterialPageRoute(builder: (context) => const SignupScreen()),
                                 );
                               },
-                        child: const Text(
+                        child: Text(
                           'Regístrate aquí',
                           style: TextStyle(
                             color: GodfatherTheme.primaryGold,

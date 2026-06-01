@@ -45,8 +45,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
+          SnackBar(
+            content: const Text(
               'Registro exitoso. ¡Te damos la bienvenida a la familia Corleone! Accediendo...',
               style: TextStyle(fontSize: 15),
             ),
@@ -68,8 +68,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Ocurrió un error inesperado al registrar el usuario.'),
+          SnackBar(
+            content: const Text('Ocurrió un error inesperado al registrar el usuario.'),
             backgroundColor: GodfatherTheme.alertRed,
           ),
         );
@@ -124,8 +124,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     controller: _fullNameController,
                     keyboardType: TextInputType.name,
                     textInputAction: TextInputAction.next,
-                    style: const TextStyle(color: GodfatherTheme.textLight),
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: GodfatherTheme.textLight),
+                    decoration: InputDecoration(
                       labelText: 'Nombre y Apellido',
                       prefixIcon: Icon(Icons.person_outline, color: GodfatherTheme.primaryGold),
                     ),
@@ -143,8 +143,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
-                    style: const TextStyle(color: GodfatherTheme.textLight),
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: GodfatherTheme.textLight),
+                    decoration: InputDecoration(
                       labelText: 'Correo Electrónico',
                       prefixIcon: Icon(Icons.email_outlined, color: GodfatherTheme.primaryGold),
                     ),
@@ -165,10 +165,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     textInputAction: TextInputAction.next,
-                    style: const TextStyle(color: GodfatherTheme.textLight),
+                    style: TextStyle(color: GodfatherTheme.textLight),
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
-                      prefixIcon: const Icon(Icons.lock_outlined, color: GodfatherTheme.primaryGold),
+                      prefixIcon: Icon(Icons.lock_outlined, color: GodfatherTheme.primaryGold),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -198,8 +198,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     controller: _confirmPasswordController,
                     obscureText: _obscurePassword,
                     textInputAction: TextInputAction.done,
-                    style: const TextStyle(color: GodfatherTheme.textLight),
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: GodfatherTheme.textLight),
+                    decoration: InputDecoration(
                       labelText: 'Confirmar Contraseña',
                       prefixIcon: Icon(Icons.lock_reset_outlined, color: GodfatherTheme.primaryGold),
                     ),
@@ -219,7 +219,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ElevatedButton(
                     onPressed: _isLoading ? null : _signUp,
                     child: _isLoading
-                        ? const SizedBox(
+                        ? SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
@@ -235,13 +235,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         '¿Ya eres de la familia?',
                         style: TextStyle(color: GodfatherTheme.textLight, fontSize: 17),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text(
+                        child: Text(
                           'Inicia sesión',
                           style: TextStyle(
                             color: GodfatherTheme.primaryGold,

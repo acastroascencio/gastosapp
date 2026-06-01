@@ -47,16 +47,31 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              ref.watch(themeModeProvider) == ThemeMode.dark
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
+              color: GodfatherTheme.primaryGold,
+              size: 28,
+            ),
+            onPressed: () {
+              ref.read(themeModeProvider.notifier).toggleTheme();
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         child: transactionsAsync.when(
-          loading: () => const Center(
+          loading: () => Center(
             child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(GodfatherTheme.primaryGold)),
           ),
           error: (err, stack) => Center(
             child: Text(
               'Error al cargar informes: $err',
-              style: const TextStyle(color: GodfatherTheme.alertRed),
+              style: TextStyle(color: GodfatherTheme.alertRed),
             ),
           ),
           data: (transactions) {
@@ -125,6 +140,206 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               colorIndex++;
             });
 
+            final isWide = MediaQuery.of(context).size.width > 900;
+
+            // Widget de la izquierda (Gráfico, Leyenda y Resumen Numérico)
+            Widget leftColumnContent = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Gráfico de anillos con FL_CHART
+                if (totalExpenses > 0)
+                  Container(
+                    height: 200,
+                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    child: PieChart(
+                      PieChartData(
+                        sectionsSpace: 3,
+                        centerSpaceRadius: 40,
+                        sections: chartSections,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    height: 140,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Sin egresos registrados en este periodo.',
+                      style: TextStyle(color: GodfatherTheme.textLight.withValues(alpha: 0.7), fontStyle: FontStyle.italic, fontSize: 18),
+                    ),
+                  ),
+
+                // Leyenda de categorías del gráfico
+                if (totalExpenses > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: List.generate(expensesByCategory.length, (index) {
+                        final entry = expensesByCategory.entries.elementAt(index);
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: colors[index % colors.length],
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${entry.key}: S/. ${entry.value.toStringAsFixed(0)}',
+                              style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight),
+                            ),
+                          ],
+                        );
+                      }),
+                    ),
+                  ),
+
+                // Resumen numérico premium
+                Card(
+                  elevation: 2,
+                  color: GodfatherTheme.surfaceDark,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(color: GodfatherTheme.borderColor),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        if (_selectedModule == TargetModule.casa) ...[
+                          Column(
+                            children: [
+                              Text('Ingresos', style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
+                              const SizedBox(height: 6),
+                              Text(
+                                'S/. ${totalIncome.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                    color: GodfatherTheme.successGreen,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20),
+                              ),
+                            ],
+                          ),
+                          Container(width: 1, height: 36, color: GodfatherTheme.borderColor),
+                        ],
+                        Column(
+                          children: [
+                            Text('Gastos', style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
+                            const SizedBox(height: 6),
+                            Text(
+                              'S/. ${totalExpenses.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                  color: GodfatherTheme.alertRed,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
+                            ),
+                          ],
+                        ),
+                        Container(width: 1, height: 36, color: GodfatherTheme.borderColor),
+                        Column(
+                          children: [
+                            Text(_selectedModule == TargetModule.casa ? 'Balance' : 'Total General',
+                                style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
+                            const SizedBox(height: 6),
+                            Text(
+                              'S/. ${balance.abs().toStringAsFixed(2)}',
+                              style: TextStyle(
+                                  color: balance >= 0 && _selectedModule == TargetModule.casa
+                                      ? GodfatherTheme.primaryGold
+                                      : GodfatherTheme.alertRed,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+
+            // Widget de la derecha (Lista de Movimientos)
+            Widget rightColumnContent = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'REGISTROS DEL PERIODO',
+                  style: GoogleFonts.cinzel(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                    color: GodfatherTheme.primaryGold,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                if (moduleTransactions.isEmpty)
+                  Container(
+                    height: 100,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Ningún movimiento en este mes, Don.',
+                      style: TextStyle(color: GodfatherTheme.textLight.withValues(alpha: 0.7), fontStyle: FontStyle.italic, fontSize: 18),
+                    ),
+                  )
+                else
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: isWide ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+                    itemCount: moduleTransactions.length,
+                    separatorBuilder: (context, index) => Divider(color: GodfatherTheme.borderColor),
+                    itemBuilder: (context, index) {
+                      final tx = moduleTransactions[index];
+                      final isExpense = tx.transactionType == TransactionType.gasto;
+                      
+                      return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+                        leading: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isExpense ? Icons.arrow_downward_outlined : Icons.arrow_upward_outlined,
+                            color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                            size: 28,
+                          ),
+                        ),
+                        title: Text(
+                          tx.concept,
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.bold,
+                            color: GodfatherTheme.textLight,
+                            fontSize: 20,
+                          ),
+                        ),
+                        subtitle: Text(
+                          '${tx.category} • ${DateFormat('dd MMM').format(tx.createdAt)}',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: GodfatherTheme.textLight.withValues(alpha: 0.7)),
+                        ),
+                        trailing: Text(
+                          '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.bold,
+                            color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                            fontSize: 22,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+              ],
+            );
+
             return Column(
               children: [
                 // Selector de mes y año
@@ -135,7 +350,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.chevron_left, color: GodfatherTheme.primaryGold),
+                        icon: Icon(Icons.chevron_left, color: GodfatherTheme.primaryGold),
                         onPressed: () => _changeMonth(-1),
                       ),
                       Text(
@@ -148,7 +363,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.chevron_right, color: GodfatherTheme.primaryGold),
+                        icon: Icon(Icons.chevron_right, color: GodfatherTheme.primaryGold),
                         onPressed: () => _changeMonth(1),
                       ),
                     ],
@@ -165,19 +380,19 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                           labelPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                           label: const Text('GASTOS PERSONALES'),
                           selected: _selectedModule == TargetModule.personal,
-                          selectedColor: GodfatherTheme.primaryGold.withOpacity(0.2),
+                          selectedColor: GodfatherTheme.primaryGold.withValues(alpha: 0.2),
                           backgroundColor: Colors.transparent,
                           labelStyle: TextStyle(
                             color: _selectedModule == TargetModule.personal
                                 ? GodfatherTheme.primaryGold
                                 : GodfatherTheme.textMuted,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 15,
                           ),
                           side: BorderSide(
                             color: _selectedModule == TargetModule.personal
                                 ? GodfatherTheme.primaryGold
-                                : const Color(0xFF2C2C30),
+                                : GodfatherTheme.borderColor,
                           ),
                           onSelected: (val) {
                             if (val) setState(() => _selectedModule = TargetModule.personal);
@@ -190,19 +405,19 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                           labelPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                           label: const Text('GASTOS DE LA CASA'),
                           selected: _selectedModule == TargetModule.casa,
-                          selectedColor: GodfatherTheme.primaryGold.withOpacity(0.2),
+                          selectedColor: GodfatherTheme.primaryGold.withValues(alpha: 0.2),
                           backgroundColor: Colors.transparent,
                           labelStyle: TextStyle(
                             color: _selectedModule == TargetModule.casa
                                 ? GodfatherTheme.primaryGold
                                 : GodfatherTheme.textMuted,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 15,
                           ),
                           side: BorderSide(
                             color: _selectedModule == TargetModule.casa
                                 ? GodfatherTheme.primaryGold
-                                : const Color(0xFF2C2C30),
+                                : GodfatherTheme.borderColor,
                           ),
                           onSelected: (val) {
                             if (val) setState(() => _selectedModule = TargetModule.casa);
@@ -214,202 +429,39 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                 ),
 
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Gráfico de anillos con FL_CHART
-                        if (totalExpenses > 0)
-                          Container(
-                            height: 180,
-                            margin: const EdgeInsets.symmetric(vertical: 12),
-                            child: PieChart(
-                              PieChartData(
-                                sectionsSpace: 3,
-                                centerSpaceRadius: 40,
-                                sections: chartSections,
+                  child: isWide
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 5,
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: leftColumnContent,
                               ),
                             ),
-                          )
-                        else
-                          Container(
-                            height: 140,
-                            alignment: Alignment.center,
-                            child: Text(
-                              'Sin egresos registrados en este periodo.',
-                              style: TextStyle(color: GodfatherTheme.textLight.withValues(alpha: 0.7), fontStyle: FontStyle.italic, fontSize: 16),
+                            VerticalDivider(color: GodfatherTheme.borderColor, width: 1),
+                            Expanded(
+                              flex: 6,
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: rightColumnContent,
+                              ),
                             ),
-                          ),
-
-                        // Leyenda de categorías del gráfico
-                        if (totalExpenses > 0)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: Wrap(
-                              spacing: 12,
-                              runSpacing: 8,
-                              alignment: WrapAlignment.center,
-                              children: List.generate(expensesByCategory.length, (index) {
-                                final entry = expensesByCategory.entries.elementAt(index);
-                                return Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        color: colors[index % colors.length],
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '${entry.key}: S/. ${entry.value.toStringAsFixed(0)}',
-                                      style: const TextStyle(fontSize: 14, color: GodfatherTheme.textLight),
-                                    ),
-                                  ],
-                                );
-                              }),
-                            ),
-                          ),
-
-                        // Resumen numérico premium
-                        Card(
-                          elevation: 2,
-                          color: GodfatherTheme.surfaceDark,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: const BorderSide(color: Color(0xFF2C2C30)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(18.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                if (_selectedModule == TargetModule.casa) ...[
-                                  Column(
-                                    children: [
-                                      Text('Ingresos', style: TextStyle(fontSize: 14, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        'S/. ${totalIncome.toStringAsFixed(2)}',
-                                        style: const TextStyle(
-                                            color: GodfatherTheme.successGreen,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
-                                      ),
-                                    ],
-                                  ),
-                                  Container(width: 1, height: 36, color: const Color(0xFF2C2C30)),
-                                ],
-                                Column(
-                                  children: [
-                                    Text('Gastos', style: TextStyle(fontSize: 14, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      'S/. ${totalExpenses.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                          color: GodfatherTheme.alertRed,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                  ],
-                                ),
-                                Container(width: 1, height: 36, color: const Color(0xFF2C2C30)),
-                                Column(
-                                  children: [
-                                    Text(_selectedModule == TargetModule.casa ? 'Balance' : 'Total General',
-                                        style: TextStyle(fontSize: 14, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      'S/. ${balance.abs().toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                          color: balance >= 0 && _selectedModule == TargetModule.casa
-                                              ? GodfatherTheme.primaryGold
-                                              : GodfatherTheme.alertRed,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          ],
+                        )
+                      : SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              leftColumnContent,
+                              const SizedBox(height: 24),
+                              rightColumnContent,
+                              const SizedBox(height: 32),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 24),
-
-                        // Historial de transacciones de la lista
-                        Text(
-                          'REGISTROS DEL PERIODO',
-                          style: GoogleFonts.cinzel(
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.5,
-                            color: GodfatherTheme.primaryGold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        if (moduleTransactions.isEmpty)
-                          Container(
-                            height: 100,
-                            alignment: Alignment.center,
-                            child: Text(
-                              'Ningún movimiento en este mes, Don.',
-                              style: TextStyle(color: GodfatherTheme.textLight.withValues(alpha: 0.7), fontStyle: FontStyle.italic, fontSize: 16),
-                            ),
-                          )
-                        else
-                          ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: moduleTransactions.length,
-                            separatorBuilder: (context, index) => const Divider(color: Color(0xFF232328)),
-                            itemBuilder: (context, index) {
-                              final tx = moduleTransactions[index];
-                              final isExpense = tx.transactionType == TransactionType.gasto;
-                              
-                              return ListTile(
-                                contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
-                                leading: Container(
-                                  padding: const EdgeInsets.all(10.0),
-                                  decoration: BoxDecoration(
-                                    color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    isExpense ? Icons.arrow_downward_outlined : Icons.arrow_upward_outlined,
-                                    color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                                    size: 26,
-                                  ),
-                                ),
-                                title: Text(
-                                  tx.concept,
-                                  style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.bold,
-                                    color: GodfatherTheme.textLight,
-                                    fontSize: 19,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  '${tx.category} • ${DateFormat('dd MMM').format(tx.createdAt)}',
-                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: GodfatherTheme.textLight.withValues(alpha: 0.7)),
-                                ),
-                                trailing: Text(
-                                  '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                                  style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.bold,
-                                    color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        const SizedBox(height: 32),
-                      ],
-                    ),
-                  ),
                 ),
               ],
             );

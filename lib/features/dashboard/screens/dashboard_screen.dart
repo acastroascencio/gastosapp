@@ -191,7 +191,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               TextField(
                 controller: controller,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                style: const TextStyle(color: GodfatherTheme.textLight),
+                style: TextStyle(color: GodfatherTheme.textLight),
                 decoration: const InputDecoration(
                   labelText: 'Monto Límite (S/.)',
                 ),
@@ -201,7 +201,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('CANCELAR', style: TextStyle(color: GodfatherTheme.textMuted)),
+              child: Text('CANCELAR', style: TextStyle(color: GodfatherTheme.textMuted)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -236,11 +236,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           backgroundColor: GodfatherTheme.surfaceDark,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: GodfatherTheme.primaryGold, width: 1.5),
+            side: BorderSide(color: GodfatherTheme.primaryGold, width: 1.5),
           ),
           title: Row(
             children: [
-              const Icon(Icons.manage_accounts, color: GodfatherTheme.primaryGold),
+              Icon(Icons.manage_accounts, color: GodfatherTheme.primaryGold),
               const SizedBox(width: 10),
               Text(
                 'PERFIL DE LA FAMILIA',
@@ -266,8 +266,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               // Campo Nombre Completo
               TextField(
                 controller: nameController,
-                style: const TextStyle(color: GodfatherTheme.textLight),
-                decoration: const InputDecoration(
+                style: TextStyle(color: GodfatherTheme.textLight),
+                decoration: InputDecoration(
                   labelText: 'Nombre Completo',
                   prefixIcon: Icon(Icons.person_outline, color: GodfatherTheme.primaryGold),
                 ),
@@ -278,10 +278,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               TextField(
                 controller: TextEditingController(text: currentEmail),
                 enabled: false,
-                style: const TextStyle(color: GodfatherTheme.textMuted),
+                style: TextStyle(color: GodfatherTheme.textMuted),
                 decoration: InputDecoration(
                   labelText: 'Correo Electrónico (Fijo)',
-                  prefixIcon: const Icon(Icons.email_outlined, color: GodfatherTheme.textMuted),
+                  prefixIcon: Icon(Icons.email_outlined, color: GodfatherTheme.textMuted),
                   fillColor: const Color(0xFF131316),
                   filled: true,
                   border: OutlineInputBorder(
@@ -295,7 +295,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text(
+              child: Text(
                 'CANCELAR',
                 style: TextStyle(color: GodfatherTheme.textMuted, fontWeight: FontWeight.bold),
               ),
@@ -311,11 +311,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     await ref.read(profileProvider.notifier).updateProfile(newName);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Perfil de Supabase sincronizado con éxito, Don Corleone.'),
-                          backgroundColor: GodfatherTheme.successGreen,
-                        ),
-                      );
+                      SnackBar(
+                        content: Text('Perfil de Supabase sincronizado con éxito, Don Corleone.'),
+                        backgroundColor: GodfatherTheme.successGreen,
+                      ),
+                    );
                     }
                   } else {
                     // Modo Bypass: Simulación en caliente para desarrollo
@@ -324,11 +324,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     });
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Perfil de desarrollador actualizado con éxito.'),
-                          backgroundColor: GodfatherTheme.primaryGold,
-                        ),
-                      );
+                      SnackBar(
+                        content: Text('Perfil de desarrollador actualizado con éxito.'),
+                        backgroundColor: GodfatherTheme.primaryGold,
+                      ),
+                    );
                     }
                   }
                   if (context.mounted) Navigator.pop(context);
@@ -392,13 +392,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
       backgroundColor: GodfatherTheme.backgroundBlack,
       body: SafeArea(
         child: transactionsAsync.when(
-          loading: () => const Center(
+          loading: () => Center(
             child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(GodfatherTheme.primaryGold)),
           ),
           error: (err, stack) => Center(
             child: Text(
               'Error al cargar datos: $err',
-              style: const TextStyle(color: GodfatherTheme.alertRed),
+              style: TextStyle(color: GodfatherTheme.alertRed),
             ),
           ),
           data: (transactions) {
@@ -455,10 +455,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: GodfatherTheme.backgroundBlack,
         border: Border(
-          bottom: BorderSide(color: Color(0xFF1E1E24), width: 1),
+          bottom: BorderSide(color: GodfatherTheme.borderColor, width: 1),
         ),
       ),
       child: Column(
@@ -479,7 +479,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             children: [
               // Hamburguesa de menú dorada
               IconButton(
-                icon: const Icon(Icons.menu, color: GodfatherTheme.primaryGold, size: 24),
+                icon: Icon(Icons.menu, color: GodfatherTheme.primaryGold, size: 24),
                 onPressed: () {
                   // Abre el Drawer lateral premium
                   _scaffoldKey.currentState?.openDrawer();
@@ -495,10 +495,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   letterSpacing: 2.0,
                 ),
               ),
-              // Engrane de ajustes dorado
-              IconButton(
-                icon: const Icon(Icons.settings, color: GodfatherTheme.primaryGold, size: 24),
-                onPressed: _showEditProfileDialog,
+              // Theme Toggle button next to Settings engrane
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      ref.watch(themeModeProvider) == ThemeMode.dark
+                          ? Icons.light_mode
+                          : Icons.dark_mode,
+                      color: GodfatherTheme.primaryGold,
+                      size: 24,
+                    ),
+                    onPressed: () {
+                      ref.read(themeModeProvider.notifier).toggleTheme();
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.settings, color: GodfatherTheme.primaryGold, size: 24),
+                    onPressed: _showEditProfileDialog,
+                  ),
+                ],
               ),
             ],
           ),
@@ -553,14 +570,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               label: Text(entry.value.toUpperCase()),
               selected: isSelected,
               selectedColor: GodfatherTheme.primaryGold.withValues(alpha: 0.25),
-              backgroundColor: const Color(0xFF131316),
+              backgroundColor: GodfatherTheme.surfaceDarkAlt,
               labelStyle: TextStyle(
                 color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textLight.withValues(alpha: 0.7),
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),
               side: BorderSide(
-                color: isSelected ? GodfatherTheme.primaryGold : const Color(0xFF2C2C30),
+                color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.borderColor,
                 width: isSelected ? 2.0 : 1.0,
               ),
               shape: RoundedRectangleBorder(
@@ -568,9 +585,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               ),
               onSelected: (selected) {
                 if (selected) {
-                  setState(() {
-                    _selectedDate = DateTime(2026, entry.key, 1);
-                  });
+                   setState(() {
+                     _selectedDate = DateTime(_selectedDate.year, entry.key, 1);
+                   });
                 }
               },
             ),
@@ -636,7 +653,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: GodfatherTheme.primaryGold.withOpacity(0.35),
+                          color: GodfatherTheme.primaryGold.withValues(alpha: 0.35),
                           blurRadius: 18,
                           spreadRadius: 2,
                         ),
@@ -656,7 +673,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     ),
                     padding: const EdgeInsets.all(5.0), // Grosor del anillo exterior
                     child: Container(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: GodfatherTheme.backgroundBlack, // Borde negro carbón de separación
                       ),
@@ -688,7 +705,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                                     'assets/images/godfather_asistente.png', // Fallback al PNG
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
-                                      return const Icon(
+                                      return Icon(
                                         Icons.person,
                                         size: 110,
                                         color: GodfatherTheme.primaryGold,
@@ -815,7 +832,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               ),
               boxShadow: [
                 BoxShadow(
-                  color: GodfatherTheme.primaryGold.withOpacity(0.18),
+                  color: GodfatherTheme.primaryGold.withValues(alpha: 0.18),
                   blurRadius: 12,
                   spreadRadius: 1,
                 ),
@@ -874,7 +891,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       height: 72,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: borderColor.withOpacity(0.15),
+                        color: borderColor.withValues(alpha: 0.15),
                       ),
                       child: Icon(fallbackIcon, size: 36, color: borderColor),
                     ),
@@ -921,197 +938,231 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     final disponible = (limit + personalIncomes - personalExpenses).clamp(0.0, double.infinity);
     final spentPercentage = limit > 0 ? (personalExpenses / limit) : 0.0;
 
+    final isWide = MediaQuery.of(context).size.width > 900;
+
+    final budgetCard = Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: GodfatherTheme.borderColor),
+      ),
+      color: GodfatherTheme.surfaceDark,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'CAJA CHICA PERSONAL',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: GodfatherTheme.primaryGold, fontSize: 22),
+                ),
+                IconButton(
+                  icon: Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
+                  onPressed: () => _showConfigureBudgetDialog(limit),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            
+            // Gastos del mes
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Gastos del mes:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
+                Text(
+                  'S/. ${personalExpenses.toStringAsFixed(2)}',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    color: spentPercentage >= 1.0 ? GodfatherTheme.alertRed : GodfatherTheme.textLight,
+                    fontSize: 24,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Caja chica consumida
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Caja chica consumida:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
+                Text(
+                  'S/. ${personalExpenses.toStringAsFixed(2)}',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    color: spentPercentage >= 1.0 ? GodfatherTheme.alertRed : GodfatherTheme.textLight,
+                    fontSize: 24,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Límite de caja chica
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Límite de caja chica:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
+                Text(
+                  'S/. ${limit.toStringAsFixed(2)}',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    color: GodfatherTheme.textLight,
+                    fontSize: 24,
+                  ),
+                ),
+              ],
+            ),
+
+            Divider(height: 32, color: GodfatherTheme.borderColor),
+
+            // Saldo disponible
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Saldo disponible:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: GodfatherTheme.textLight)),
+                Text(
+                  'S/. ${disponible.toStringAsFixed(2)}',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    color: disponible > 0 ? GodfatherTheme.successGreen : GodfatherTheme.alertRed,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: LinearProgressIndicator(
+                value: spentPercentage.clamp(0.0, 1.0),
+                minHeight: 10,
+                backgroundColor: GodfatherTheme.surfaceDarkAlt,
+                valueColor: AlwaysStoppedAnimation(
+                  spentPercentage >= 1.0 ? GodfatherTheme.alertRed : GodfatherTheme.primaryGold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final historyList = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'HISTORIAL PERSONAL',
+          style: GoogleFonts.cinzel(color: GodfatherTheme.primaryGold, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 18),
+        ),
+        const SizedBox(height: 12),
+        if (personalTxs.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 36.0),
+            child: Text(
+              'Sin movimientos registrados en tu caja chica.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: GodfatherTheme.textMuted, fontStyle: FontStyle.italic, fontSize: 18),
+            ),
+          )
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: isWide ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+            itemCount: personalTxs.length,
+            separatorBuilder: (context, index) => Divider(color: GodfatherTheme.borderColor),
+            itemBuilder: (context, index) {
+              final tx = personalTxs[index];
+              final isExpense = tx.transactionType == TransactionType.gasto;
+              return ListTile(
+                contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+                leading: Container(
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    _getCategoryIcon(tx.category, tx.transactionType),
+                    color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                    size: 28,
+                  ),
+                ),
+                title: Text(
+                  tx.concept,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: GodfatherTheme.textLight,
+                  ),
+                ),
+                subtitle: Text(
+                  tx.category,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: GodfatherTheme.textLight.withValues(alpha: 0.7),
+                  ),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    IconButton(
+                      icon: Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
+                      onPressed: () => _openEditTransaction(tx),
+                      constraints: const BoxConstraints(),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+      ],
+    );
+
+    if (isWide) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 5,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20.0),
+              child: budgetCard,
+            ),
+          ),
+          VerticalDivider(color: GodfatherTheme.borderColor, width: 1),
+          Expanded(
+            flex: 6,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20.0),
+              child: historyList,
+            ),
+          ),
+        ],
+      );
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Tarjeta de Presupuesto
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: const BorderSide(color: Color(0xFF2C2C30)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'CAJA CHICA PERSONAL',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: GodfatherTheme.primaryGold, fontSize: 22),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
-                        onPressed: () => _showConfigureBudgetDialog(limit),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // Gastos del mes
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Gastos del mes:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
-                      Text(
-                        'S/. ${personalExpenses.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          color: spentPercentage >= 1.0 ? GodfatherTheme.alertRed : GodfatherTheme.textLight,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Caja chica consumida
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Caja chica consumida:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
-                      Text(
-                        'S/. ${personalExpenses.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          color: spentPercentage >= 1.0 ? GodfatherTheme.alertRed : GodfatherTheme.textLight,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Límite de caja chica
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Límite de caja chica:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
-                      Text(
-                        'S/. ${limit.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          color: GodfatherTheme.textLight,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const Divider(height: 32, color: Color(0xFF2C2C30)),
-
-                  // Saldo disponible
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Saldo disponible:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                      Text(
-                        'S/. ${disponible.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 28,
-                          color: disponible > 0 ? GodfatherTheme.successGreen : GodfatherTheme.alertRed,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: LinearProgressIndicator(
-                      value: spentPercentage.clamp(0.0, 1.0),
-                      minHeight: 10,
-                      backgroundColor: const Color(0xFF232328),
-                      valueColor: AlwaysStoppedAnimation(
-                        spentPercentage >= 1.0 ? GodfatherTheme.alertRed : GodfatherTheme.primaryGold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          budgetCard,
           const SizedBox(height: 24),
-          Text(
-            'HISTORIAL PERSONAL',
-            style: GoogleFonts.cinzel(color: GodfatherTheme.primaryGold, fontWeight: FontWeight.bold, letterSpacing: 1),
-          ),
-          const SizedBox(height: 12),
-          if (personalTxs.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 36.0),
-              child: Text(
-                'Sin movimientos registrados en tu caja chica.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: GodfatherTheme.textMuted, fontStyle: FontStyle.italic),
-              ),
-            )
-          else
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: personalTxs.length,
-              separatorBuilder: (context, index) => const Divider(color: Color(0xFF232328)),
-              itemBuilder: (context, index) {
-                final tx = personalTxs[index];
-                final isExpense = tx.transactionType == TransactionType.gasto;
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
-                  leading: Container(
-                    padding: const EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-                      color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      _getCategoryIcon(tx.category, tx.transactionType),
-                      color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                      size: 26,
-                    ),
-                  ),
-                  title: Text(
-                    tx.concept,
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 19,
-                      color: GodfatherTheme.textLight,
-                    ),
-                  ),
-                  subtitle: Text(
-                    tx.category,
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: GodfatherTheme.textLight.withValues(alpha: 0.7),
-                    ),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      IconButton(
-                        icon: const Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
-                        onPressed: () => _openEditTransaction(tx),
-                        constraints: const BoxConstraints(),
-                        padding: EdgeInsets.zero,
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+          historyList,
         ],
       ),
     );
@@ -1142,176 +1193,210 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         .where((tx) => tx.transactionType == TransactionType.gasto)
         .length;
 
+    final isWide = MediaQuery.of(context).size.width > 900;
+
+    final balanceCard = Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: GodfatherTheme.borderColor),
+      ),
+      color: GodfatherTheme.surfaceDark,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'BALANCE INTELIGENTE DE CASA',
+              style: TextStyle(fontWeight: FontWeight.bold, color: GodfatherTheme.primaryGold, fontSize: 22),
+            ),
+            const SizedBox(height: 20),
+            
+            // Abonos del mes
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Abonos del mes:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
+                Text(
+                  'S/. ${houseIncomes.toStringAsFixed(2)}',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    color: GodfatherTheme.successGreen,
+                    fontSize: 24,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Gastos del mes
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Gastos del mes:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
+                Text(
+                  'S/. ${houseExpenses.toStringAsFixed(2)}',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    color: GodfatherTheme.alertRed,
+                    fontSize: 24,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Servicios pagados count
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Servicios pagados:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
+                Text(
+                  '$servicesCount',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    color: GodfatherTheme.primaryGold,
+                    fontSize: 24,
+                  ),
+                ),
+              ],
+            ),
+
+            Divider(height: 32, color: GodfatherTheme.borderColor),
+
+            // Saldo restante
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Saldo restante:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: GodfatherTheme.textLight)),
+                Text(
+                  '${houseBalance < 0 ? "-" : ""}S/. ${houseBalance.abs().toStringAsFixed(2)}',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    color: houseBalance >= 0 ? GodfatherTheme.primaryGold : GodfatherTheme.alertRed,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final historyList = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'HISTORIAL COMPARTIDO DE CASA',
+          style: GoogleFonts.cinzel(color: GodfatherTheme.primaryGold, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 18),
+        ),
+        const SizedBox(height: 12),
+        if (houseTxs.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 36.0),
+            child: Text(
+              'Sin movimientos registrados en los gastos compartidos.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: GodfatherTheme.textMuted, fontStyle: FontStyle.italic, fontSize: 18),
+            ),
+          )
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: isWide ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+            itemCount: houseTxs.length,
+            separatorBuilder: (context, index) => Divider(color: GodfatherTheme.borderColor),
+            itemBuilder: (context, index) {
+              final tx = houseTxs[index];
+              final isExpense = tx.transactionType == TransactionType.gasto;
+              return ListTile(
+                contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+                leading: Container(
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    _getCategoryIcon(tx.category, tx.transactionType),
+                    color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                    size: 28,
+                  ),
+                ),
+                title: Text(
+                  tx.concept,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: GodfatherTheme.textLight,
+                  ),
+                ),
+                subtitle: Text(
+                  tx.category,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: GodfatherTheme.textLight.withValues(alpha: 0.7),
+                  ),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    IconButton(
+                      icon: Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
+                      onPressed: () => _openEditTransaction(tx),
+                      constraints: const BoxConstraints(),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+      ],
+    );
+
+    if (isWide) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 5,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20.0),
+              child: balanceCard,
+            ),
+          ),
+          VerticalDivider(color: GodfatherTheme.borderColor, width: 1),
+          Expanded(
+            flex: 6,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20.0),
+              child: historyList,
+            ),
+          ),
+        ],
+      );
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Tarjeta de balance inteligente
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: const BorderSide(color: Color(0xFF2C2C30)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'BALANCE INTELIGENTE DE CASA',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: GodfatherTheme.primaryGold, fontSize: 22),
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // Abonos del mes
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Abonos del mes:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
-                      Text(
-                        'S/. ${houseIncomes.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          color: GodfatherTheme.successGreen,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Gastos del mes
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Gastos del mes:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
-                      Text(
-                        'S/. ${houseExpenses.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          color: GodfatherTheme.alertRed,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Servicios pagados count
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Servicios pagados:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
-                      Text(
-                        '$servicesCount',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          color: GodfatherTheme.primaryGold,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const Divider(height: 32, color: Color(0xFF2C2C30)),
-
-                  // Saldo restante
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Saldo restante:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                      Text(
-                        '${houseBalance < 0 ? "-" : ""}S/. ${houseBalance.abs().toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 28,
-                          color: houseBalance >= 0 ? GodfatherTheme.primaryGold : GodfatherTheme.alertRed,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+          balanceCard,
           const SizedBox(height: 24),
-          Text(
-            'HISTORIAL COMPARTIDO DE CASA',
-            style: GoogleFonts.cinzel(color: GodfatherTheme.primaryGold, fontWeight: FontWeight.bold, letterSpacing: 1),
-          ),
-          const SizedBox(height: 12),
-          if (houseTxs.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 36.0),
-              child: Text(
-                'Sin movimientos registrados en los gastos compartidos.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: GodfatherTheme.textMuted, fontStyle: FontStyle.italic),
-              ),
-            )
-          else
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: houseTxs.length,
-              separatorBuilder: (context, index) => const Divider(color: Color(0xFF232328)),
-              itemBuilder: (context, index) {
-                final tx = houseTxs[index];
-                final isExpense = tx.transactionType == TransactionType.gasto;
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
-                  leading: Container(
-                    padding: const EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-                      color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      _getCategoryIcon(tx.category, tx.transactionType),
-                      color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                      size: 26,
-                    ),
-                  ),
-                  title: Text(
-                    tx.concept,
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 19,
-                      color: GodfatherTheme.textLight,
-                    ),
-                  ),
-                  subtitle: Text(
-                    tx.category,
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: GodfatherTheme.textLight.withValues(alpha: 0.7),
-                    ),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      IconButton(
-                        icon: const Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
-                        onPressed: () => _openEditTransaction(tx),
-                        constraints: const BoxConstraints(),
-                        padding: EdgeInsets.zero,
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+          historyList,
         ],
       ),
     );
@@ -1320,10 +1405,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   // BOTTOM NAVIGATION BAR PERSONALIZADO IDÉNTICO AL DEL MOCKUP
   Widget _buildBottomNavigationBar() {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: GodfatherTheme.backgroundBlack,
         border: Border(
-          top: BorderSide(color: Color(0xFF1E1E24), width: 1.5),
+          top: BorderSide(color: GodfatherTheme.borderColor, width: 1.5),
         ),
       ),
       child: BottomNavigationBar(
@@ -1342,7 +1427,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         selectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold),
         unselectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold),
         iconSize: 28,
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_outlined),
             activeIcon: Icon(Icons.dashboard, color: GodfatherTheme.primaryGold),
@@ -1380,14 +1465,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
 
     return Drawer(
       child: Container(
-        color: GodfatherTheme.backgroundBlack, // Puro #0B0B0B
+        color: GodfatherTheme.backgroundBlack,
         child: Column(
           children: [
             // Drawer Header de Lujo
             Container(
               padding: const EdgeInsets.only(top: 60, bottom: 24, left: 20, right: 20),
-              decoration: const BoxDecoration(
-                color: Color(0xFF0D0D10),
+              decoration: BoxDecoration(
+                color: GodfatherTheme.surfaceDarkAlt,
                 border: Border(
                   bottom: BorderSide(color: GodfatherTheme.primaryGold, width: 1.5),
                 ),
@@ -1403,7 +1488,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       border: Border.all(color: GodfatherTheme.primaryGold, width: 1.5),
                       boxShadow: [
                         BoxShadow(
-                          color: GodfatherTheme.primaryGold.withOpacity(0.2),
+                          color: GodfatherTheme.primaryGold.withValues(alpha: 0.2),
                           blurRadius: 10,
                         ),
                       ],
@@ -1417,7 +1502,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                             'assets/images/godfather_asistente.jpg',
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.person, color: GodfatherTheme.primaryGold, size: 30);
+                              return Icon(Icons.person, color: GodfatherTheme.primaryGold, size: 30);
                             },
                           );
                         },
@@ -1523,9 +1608,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       _fadeController.forward();
                     },
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Divider(color: Color(0xFF1E1E24)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Divider(color: GodfatherTheme.borderColor),
                   ),
                   _buildDrawerItem(
                     icon: Icons.edit,
@@ -1544,9 +1629,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             // Bottom Sign Out
             Container(
               padding: const EdgeInsets.all(24.0),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(color: Color(0xFF1E1E24), width: 1),
+                  top: BorderSide(color: GodfatherTheme.borderColor, width: 1),
                 ),
               ),
               child: SafeArea(
@@ -1597,9 +1682,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: isSelected ? GodfatherTheme.primaryGold.withOpacity(0.08) : Colors.transparent,
+        color: isSelected ? GodfatherTheme.primaryGold.withValues(alpha: 0.08) : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        border: isSelected ? Border.all(color: GodfatherTheme.primaryGold.withOpacity(0.3), width: 1) : null,
+        border: isSelected ? Border.all(color: GodfatherTheme.primaryGold.withValues(alpha: 0.3), width: 1) : null,
       ),
       child: ListTile(
         onTap: onTap,
@@ -1627,7 +1712,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               )
             : null,
         trailing: isSelected
-            ? const Icon(Icons.chevron_right, color: GodfatherTheme.primaryGold, size: 20)
+            ? Icon(Icons.chevron_right, color: GodfatherTheme.primaryGold, size: 20)
             : null,
       ),
     );
