@@ -105,19 +105,19 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     'ÚNETE A LA FAMILIA',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.displayMedium?.copyWith(
-                      fontSize: 26,
+                      fontSize: 30,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Text(
                     'Registra tus datos mínimos para iniciar la contabilidad familiar.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: GodfatherTheme.textMuted,
-                      fontSize: 15,
+                      color: GodfatherTheme.textLight.withValues(alpha: 0.7),
+                      fontSize: 17,
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 36),
                   
                   // Campo Nombre Completo
                   TextFormField(
@@ -136,7 +136,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   
                   // Campo de Email
                   TextFormField(
@@ -158,7 +158,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   
                   // Campo de Contraseña
                   TextFormField(
@@ -191,7 +191,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Confirmar Contraseña
                   TextFormField(
@@ -237,7 +237,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     children: [
                       const Text(
                         '¿Ya eres de la familia?',
-                        style: TextStyle(color: GodfatherTheme.textMuted, fontSize: 15),
+                        style: TextStyle(color: GodfatherTheme.textLight, fontSize: 17),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(context),
@@ -246,7 +246,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           style: TextStyle(
                             color: GodfatherTheme.primaryGold,
                             fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                            fontSize: 17,
                           ),
                         ),
                       ),

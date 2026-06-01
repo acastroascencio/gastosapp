@@ -385,9 +385,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         Text(
           label.toUpperCase(),
           style: GoogleFonts.inter(
-            fontSize: 11,
+            fontSize: 15,
             fontWeight: FontWeight.w800,
-            color: GodfatherTheme.textMuted,
+            color: GodfatherTheme.textLight.withValues(alpha: 0.85),
             letterSpacing: 1.5,
           ),
         ),
@@ -408,7 +408,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   child: AnimatedContainer(
                      duration: const Duration(milliseconds: 250),
                      curve: Curves.easeInOut,
-                     padding: const EdgeInsets.symmetric(vertical: 10),
+                     padding: const EdgeInsets.symmetric(vertical: 14),
                      decoration: BoxDecoration(
                        color: isSelected ? activeColor.withValues(alpha: 0.15) : Colors.transparent,
                        borderRadius: BorderRadius.circular(8),
@@ -421,9 +421,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                        child: Text(
                          entry.value,
                          style: GoogleFonts.inter(
-                           fontSize: 12,
+                           fontSize: 15,
                            fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                           color: isSelected ? activeColor : GodfatherTheme.textMuted,
+                           color: isSelected ? activeColor : GodfatherTheme.textLight.withValues(alpha: 0.7),
                            letterSpacing: 0.5,
                          ),
                        ),
@@ -451,7 +451,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         Text(
           'CATEGORÍA',
           style: GoogleFonts.inter(
-            fontSize: 13,
+            fontSize: 18,
             fontWeight: FontWeight.w900,
             color: GodfatherTheme.primaryGold,
             letterSpacing: 1.8,
@@ -465,7 +465,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
             crossAxisCount: 4,
             crossAxisSpacing: 10,
             mainAxisSpacing: 12,
-            childAspectRatio: 0.82,
+            childAspectRatio: 0.72,
           ),
           itemCount: items.length,
           itemBuilder: (context, index) {
@@ -501,8 +501,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                     children: [
                       Icon(
                         item.icon,
-                        color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textMuted,
-                        size: 26,
+                        color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textLight.withValues(alpha: 0.7),
+                        size: 32,
                       ),
                       const SizedBox(height: 8),
                       Expanded(
@@ -511,9 +511,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                             item.label,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.inter(
-                              fontSize: 12,
+                              fontSize: 15,
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                              color: isSelected ? GodfatherTheme.textLight : GodfatherTheme.textMuted,
+                              color: isSelected ? GodfatherTheme.textLight : GodfatherTheme.textLight.withValues(alpha: 0.7),
                               height: 1.1,
                             ),
                             maxLines: 2,
@@ -553,8 +553,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 8,
-              height: 8,
+              width: 12,
+              height: 12,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: _type == TransactionType.gasto ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
@@ -565,15 +565,15 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
               text: TextSpan(
                 text: 'Estás registrando: ',
                 style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: GodfatherTheme.textMuted,
+                  fontSize: 15,
+                  color: GodfatherTheme.textLight.withValues(alpha: 0.8),
                   fontWeight: FontWeight.w500,
                 ),
                 children: [
                   TextSpan(
                     text: summaryText.toUpperCase(),
                     style: GoogleFonts.cinzel(
-                      fontSize: 12,
+                      fontSize: 15,
                       color: GodfatherTheme.primaryGold,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
@@ -651,7 +651,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                     isGasto ? 'REGISTRAR GASTO' : 'REGISTRAR ABONO',
                     style: GoogleFonts.cinzel(
                       color: GodfatherTheme.primaryGold,
-                      fontSize: 20,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.5,
                     ),
@@ -659,7 +659,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   GestureDetector(
                     onTap: _toggleListening,
                     child: Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         color: _isListening
                             ? GodfatherTheme.alertRed.withValues(alpha: 0.2)
@@ -673,7 +673,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                       child: Icon(
                         _isListening ? Icons.mic : Icons.mic_none,
                         color: _isListening ? GodfatherTheme.alertRed : GodfatherTheme.primaryGold,
-                        size: 22,
+                        size: 28,
                       ),
                     ),
                   ),
@@ -690,7 +690,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                     style: TextStyle(
                       color: GodfatherTheme.alertRed,
                       fontStyle: FontStyle.italic,
-                      fontSize: 13,
+                      fontSize: 16,
                     ),
                   ),
                 )
@@ -699,9 +699,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: Text(
                     'Dictado: "$_voiceText"',
-                    style: const TextStyle(
-                      color: GodfatherTheme.textMuted,
-                      fontSize: 12,
+                    style: TextStyle(
+                      color: GodfatherTheme.textLight.withValues(alpha: 0.7),
+                      fontSize: 15,
                     ),
                   ),
                 ),
@@ -765,7 +765,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.cinzel(
-                  fontSize: 38,
+                  fontSize: 44,
                   fontWeight: FontWeight.bold,
                   color: isGasto ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
                   letterSpacing: 2,
@@ -773,8 +773,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 decoration: InputDecoration(
                   hintText: '0.00',
                   hintStyle: TextStyle(
-                    color: GodfatherTheme.textMuted.withValues(alpha: 0.25),
-                    fontSize: 38,
+                    color: GodfatherTheme.textLight.withValues(alpha: 0.15),
+                    fontSize: 44,
                   ),
                   prefixIcon: Padding(
                     padding: const EdgeInsets.only(left: 16.0, right: 4.0),
@@ -783,7 +783,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                       child: Text(
                         'S/.',
                         style: GoogleFonts.cinzel(
-                          fontSize: 26,
+                          fontSize: 30,
                           color: GodfatherTheme.primaryGold,
                           fontWeight: FontWeight.bold,
                         ),
@@ -884,6 +884,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: buttonColor,
                   foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 56),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -904,7 +905,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                         buttonText,
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.w900,
-                          fontSize: 14,
+                          fontSize: 18,
                           letterSpacing: 1,
                         ),
                       ),

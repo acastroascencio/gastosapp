@@ -30,7 +30,6 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final transactionsAsync = ref.watch(transactionProvider);
 
     return Scaffold(
@@ -41,6 +40,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             color: GodfatherTheme.primaryGold,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.5,
+            fontSize: 24,
           ),
         ),
         leading: IconButton(
@@ -116,7 +116,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                   title: '${percentage.toStringAsFixed(0)}%',
                   radius: 50,
                   titleStyle: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -144,7 +144,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                           fontWeight: FontWeight.bold,
                           color: GodfatherTheme.primaryGold,
                           letterSpacing: 1,
-                          fontSize: 16,
+                          fontSize: 20,
                         ),
                       ),
                       IconButton(
@@ -162,6 +162,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                     children: [
                       Expanded(
                         child: ChoiceChip(
+                          labelPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                           label: const Text('GASTOS PERSONALES'),
                           selected: _selectedModule == TargetModule.personal,
                           selectedColor: GodfatherTheme.primaryGold.withOpacity(0.2),
@@ -171,7 +172,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                                 ? GodfatherTheme.primaryGold
                                 : GodfatherTheme.textMuted,
                             fontWeight: FontWeight.bold,
-                            fontSize: 11,
+                            fontSize: 14,
                           ),
                           side: BorderSide(
                             color: _selectedModule == TargetModule.personal
@@ -186,6 +187,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: ChoiceChip(
+                          labelPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                           label: const Text('GASTOS DE LA CASA'),
                           selected: _selectedModule == TargetModule.casa,
                           selectedColor: GodfatherTheme.primaryGold.withOpacity(0.2),
@@ -195,7 +197,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                                 ? GodfatherTheme.primaryGold
                                 : GodfatherTheme.textMuted,
                             fontWeight: FontWeight.bold,
-                            fontSize: 11,
+                            fontSize: 14,
                           ),
                           side: BorderSide(
                             color: _selectedModule == TargetModule.casa
@@ -234,9 +236,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                           Container(
                             height: 140,
                             alignment: Alignment.center,
-                            child: const Text(
+                            child: Text(
                               'Sin egresos registrados en este periodo.',
-                              style: TextStyle(color: GodfatherTheme.textMuted, fontStyle: FontStyle.italic),
+                              style: TextStyle(color: GodfatherTheme.textLight.withValues(alpha: 0.7), fontStyle: FontStyle.italic, fontSize: 16),
                             ),
                           ),
 
@@ -264,7 +266,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                                     const SizedBox(width: 6),
                                     Text(
                                       '${entry.key}: S/. ${entry.value.toStringAsFixed(0)}',
-                                      style: const TextStyle(fontSize: 11, color: GodfatherTheme.textLight),
+                                      style: const TextStyle(fontSize: 14, color: GodfatherTheme.textLight),
                                     ),
                                   ],
                                 );
@@ -281,45 +283,45 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                             side: const BorderSide(color: Color(0xFF2C2C30)),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(18.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 if (_selectedModule == TargetModule.casa) ...[
                                   Column(
                                     children: [
-                                      const Text('Ingresos', style: TextStyle(fontSize: 11)),
-                                      const SizedBox(height: 4),
+                                      Text('Ingresos', style: TextStyle(fontSize: 14, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
+                                      const SizedBox(height: 6),
                                       Text(
                                         'S/. ${totalIncome.toStringAsFixed(2)}',
                                         style: const TextStyle(
                                             color: GodfatherTheme.successGreen,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 15),
+                                            fontSize: 18),
                                       ),
                                     ],
                                   ),
-                                  Container(width: 1, height: 28, color: const Color(0xFF2C2C30)),
+                                  Container(width: 1, height: 36, color: const Color(0xFF2C2C30)),
                                 ],
                                 Column(
                                   children: [
-                                    const Text('Gastos', style: TextStyle(fontSize: 11)),
-                                    const SizedBox(height: 4),
+                                    Text('Gastos', style: TextStyle(fontSize: 14, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
+                                    const SizedBox(height: 6),
                                     Text(
                                       'S/. ${totalExpenses.toStringAsFixed(2)}',
                                       style: const TextStyle(
                                           color: GodfatherTheme.alertRed,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 15),
+                                          fontSize: 18),
                                     ),
                                   ],
                                 ),
-                                Container(width: 1, height: 28, color: const Color(0xFF2C2C30)),
+                                Container(width: 1, height: 36, color: const Color(0xFF2C2C30)),
                                 Column(
                                   children: [
                                     Text(_selectedModule == TargetModule.casa ? 'Balance' : 'Total General',
-                                        style: const TextStyle(fontSize: 11)),
-                                    const SizedBox(height: 4),
+                                        style: TextStyle(fontSize: 14, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
+                                    const SizedBox(height: 6),
                                     Text(
                                       'S/. ${balance.abs().toStringAsFixed(2)}',
                                       style: TextStyle(
@@ -327,7 +329,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                                               ? GodfatherTheme.primaryGold
                                               : GodfatherTheme.alertRed,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 15),
+                                          fontSize: 18),
                                     ),
                                   ],
                                 ),
@@ -340,10 +342,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                         // Historial de transacciones de la lista
                         Text(
                           'REGISTROS DEL PERIODO',
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                          style: GoogleFonts.cinzel(
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
+                            letterSpacing: 1.5,
                             color: GodfatherTheme.primaryGold,
+                            fontSize: 18,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -351,9 +354,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                           Container(
                             height: 100,
                             alignment: Alignment.center,
-                            child: const Text(
+                            child: Text(
                               'Ningún movimiento en este mes, Don.',
-                              style: TextStyle(color: GodfatherTheme.textMuted, fontStyle: FontStyle.italic),
+                              style: TextStyle(color: GodfatherTheme.textLight.withValues(alpha: 0.7), fontStyle: FontStyle.italic, fontSize: 16),
                             ),
                           )
                         else
@@ -367,35 +370,37 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                               final isExpense = tx.transactionType == TransactionType.gasto;
                               
                               return ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                leading: CircleAvatar(
-                                  backgroundColor: isExpense
-                                      ? GodfatherTheme.alertRed.withOpacity(0.12)
-                                      : GodfatherTheme.successGreen.withOpacity(0.12),
+                                contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+                                leading: Container(
+                                  padding: const EdgeInsets.all(10.0),
+                                  decoration: BoxDecoration(
+                                    color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                                    shape: BoxShape.circle,
+                                  ),
                                   child: Icon(
                                     isExpense ? Icons.arrow_downward_outlined : Icons.arrow_upward_outlined,
                                     color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                                    size: 18,
+                                    size: 26,
                                   ),
                                 ),
                                 title: Text(
                                   tx.concept,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.bold,
                                     color: GodfatherTheme.textLight,
-                                    fontSize: 14,
+                                    fontSize: 19,
                                   ),
                                 ),
                                 subtitle: Text(
                                   '${tx.category} • ${DateFormat('dd MMM').format(tx.createdAt)}',
-                                  style: const TextStyle(fontSize: 11, color: GodfatherTheme.textMuted),
+                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: GodfatherTheme.textLight.withValues(alpha: 0.7)),
                                 ),
                                 trailing: Text(
                                   '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                                  style: TextStyle(
+                                  style: GoogleFonts.inter(
                                     fontWeight: FontWeight.bold,
                                     color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                                    fontSize: 14,
+                                    fontSize: 20,
                                   ),
                                 ),
                               );

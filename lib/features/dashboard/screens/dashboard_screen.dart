@@ -183,9 +183,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'Establece el tope de gastos personales del mes. El Padrino vigilará este límite.',
-                style: TextStyle(color: GodfatherTheme.textMuted, fontSize: 13),
+                style: TextStyle(color: GodfatherTheme.textLight.withValues(alpha: 0.85), fontSize: 16),
               ),
               const SizedBox(height: 20),
               TextField(
@@ -257,9 +257,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
+              Text(
                 'Edita los datos del consejero. Recuerda mantener tus finanzas bajo estricto honor.',
-                style: TextStyle(color: GodfatherTheme.textMuted, fontSize: 13),
+                style: TextStyle(color: GodfatherTheme.textLight.withValues(alpha: 0.85), fontSize: 16),
               ),
               const SizedBox(height: 20),
               
@@ -467,9 +467,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           Text(
             _currentTimeString,
             style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: GodfatherTheme.textMuted,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: GodfatherTheme.textLight.withValues(alpha: 0.8),
               letterSpacing: 0.5,
             ),
           ),
@@ -539,7 +539,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     ];
 
     return SizedBox(
-      height: 38,
+      height: 48,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: months.length,
@@ -547,7 +547,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           final entry = months[index];
           final isSelected = _selectedDate.month == entry.key;
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            padding: const EdgeInsets.symmetric(horizontal: 6.0),
             child: ChoiceChip(
               showCheckmark: false,
               label: Text(entry.value.toUpperCase()),
@@ -555,16 +555,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               selectedColor: GodfatherTheme.primaryGold.withValues(alpha: 0.25),
               backgroundColor: const Color(0xFF131316),
               labelStyle: TextStyle(
-                color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textMuted,
+                color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textLight.withValues(alpha: 0.7),
                 fontWeight: FontWeight.bold,
-                fontSize: 12,
+                fontSize: 15,
               ),
               side: BorderSide(
                 color: isSelected ? GodfatherTheme.primaryGold : const Color(0xFF2C2C30),
-                width: isSelected ? 1.5 : 1.0,
+                width: isSelected ? 2.0 : 1.0,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
               ),
               onSelected: (selected) {
                 if (selected) {
@@ -723,7 +723,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       child: Text(
                         'ASISTENTE',
                         style: GoogleFonts.inter(
-                          fontSize: 11,
+                          fontSize: 14,
                           fontWeight: FontWeight.w900,
                           color: Colors.black,
                           letterSpacing: 2,
@@ -738,7 +738,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               Text(
                 'CONSEJERO DE LA FAMILIA',
                 style: GoogleFonts.cinzel(
-                  fontSize: 13,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: GodfatherTheme.primaryGold,
                   letterSpacing: 2.0,
@@ -825,7 +825,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               child: Text(
                 'VOLVER',
                 style: GoogleFonts.cinzel(
-                  fontSize: 13,
+                  fontSize: 16,
                   fontWeight: FontWeight.w900,
                   color: GodfatherTheme.primaryGold,
                   letterSpacing: 1.5,
@@ -942,84 +942,84 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     children: [
                       const Text(
                         'CAJA CHICA PERSONAL',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: GodfatherTheme.primaryGold),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: GodfatherTheme.primaryGold, fontSize: 22),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.edit, size: 16, color: GodfatherTheme.textMuted),
+                        icon: const Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
                         onPressed: () => _showConfigureBudgetDialog(limit),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   
                   // Gastos del mes
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Gastos del mes:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
+                      const Text('Gastos del mes:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
                       Text(
                         'S/. ${personalExpenses.toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
                           color: spentPercentage >= 1.0 ? GodfatherTheme.alertRed : GodfatherTheme.textLight,
-                          fontSize: 15,
+                          fontSize: 24,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
 
                   // Caja chica consumida
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Caja chica consumida:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
+                      const Text('Caja chica consumida:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
                       Text(
                         'S/. ${personalExpenses.toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
                           color: spentPercentage >= 1.0 ? GodfatherTheme.alertRed : GodfatherTheme.textLight,
-                          fontSize: 15,
+                          fontSize: 24,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
 
                   // Límite de caja chica
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Límite de caja chica:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
+                      const Text('Límite de caja chica:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
                       Text(
                         'S/. ${limit.toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
                           color: GodfatherTheme.textLight,
-                          fontSize: 15,
+                          fontSize: 24,
                         ),
                       ),
                     ],
                   ),
 
-                  const Divider(height: 24, color: Color(0xFF2C2C30)),
+                  const Divider(height: 32, color: Color(0xFF2C2C30)),
 
                   // Saldo disponible
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Saldo disponible:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text('Saldo disponible:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                       Text(
                         'S/. ${disponible.toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 28,
                           color: disponible > 0 ? GodfatherTheme.successGreen : GodfatherTheme.alertRed,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
                     child: LinearProgressIndicator(
@@ -1060,9 +1060,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 final tx = personalTxs[index];
                 final isExpense = tx.transactionType == TransactionType.gasto;
                 return ListTile(
-                  contentPadding: EdgeInsets.zero,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
                   leading: Container(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(10.0),
                     decoration: BoxDecoration(
                       color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
@@ -1070,23 +1070,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     child: Icon(
                       _getCategoryIcon(tx.category, tx.transactionType),
                       color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                      size: 22,
+                      size: 26,
                     ),
                   ),
                   title: Text(
                     tx.concept,
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 19,
                       color: GodfatherTheme.textLight,
                     ),
                   ),
                   subtitle: Text(
                     tx.category,
                     style: GoogleFonts.inter(
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: GodfatherTheme.textMuted,
+                      color: GodfatherTheme.textLight.withValues(alpha: 0.7),
                     ),
                   ),
                   trailing: Row(
@@ -1096,13 +1096,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                         '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 20,
                           color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
                         ),
                       ),
                       const SizedBox(width: 12),
                       IconButton(
-                        icon: const Icon(Icons.edit, size: 20, color: GodfatherTheme.primaryGold),
+                        icon: const Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
                         onPressed: () => _openEditTransaction(tx),
                         constraints: const BoxConstraints(),
                         padding: EdgeInsets.zero,
@@ -1160,72 +1160,72 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 children: [
                   const Text(
                     'BALANCE INTELIGENTE DE CASA',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: GodfatherTheme.primaryGold),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: GodfatherTheme.primaryGold, fontSize: 22),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   
                   // Abonos del mes
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Abonos del mes:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
+                      const Text('Abonos del mes:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
                       Text(
                         'S/. ${houseIncomes.toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
                           color: GodfatherTheme.successGreen,
-                          fontSize: 15,
+                          fontSize: 24,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
 
                   // Gastos del mes
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Gastos del mes:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
+                      const Text('Gastos del mes:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
                       Text(
                         'S/. ${houseExpenses.toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
                           color: GodfatherTheme.alertRed,
-                          fontSize: 15,
+                          fontSize: 24,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
 
                   // Servicios pagados count
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Servicios pagados:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
+                      const Text('Servicios pagados:', style: TextStyle(fontSize: 18, color: GodfatherTheme.textLight)),
                       Text(
                         '$servicesCount',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
                           color: GodfatherTheme.primaryGold,
-                          fontSize: 15,
+                          fontSize: 24,
                         ),
                       ),
                     ],
                   ),
 
-                  const Divider(height: 24, color: Color(0xFF2C2C30)),
+                  const Divider(height: 32, color: Color(0xFF2C2C30)),
 
                   // Saldo restante
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Saldo restante:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text('Saldo restante:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                       Text(
                         '${houseBalance < 0 ? "-" : ""}S/. ${houseBalance.abs().toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 28,
                           color: houseBalance >= 0 ? GodfatherTheme.primaryGold : GodfatherTheme.alertRed,
                         ),
                       ),
@@ -1260,9 +1260,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 final tx = houseTxs[index];
                 final isExpense = tx.transactionType == TransactionType.gasto;
                 return ListTile(
-                  contentPadding: EdgeInsets.zero,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
                   leading: Container(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(10.0),
                     decoration: BoxDecoration(
                       color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
@@ -1270,23 +1270,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     child: Icon(
                       _getCategoryIcon(tx.category, tx.transactionType),
                       color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                      size: 22,
+                      size: 26,
                     ),
                   ),
                   title: Text(
                     tx.concept,
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 19,
                       color: GodfatherTheme.textLight,
                     ),
                   ),
                   subtitle: Text(
                     tx.category,
                     style: GoogleFonts.inter(
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: GodfatherTheme.textMuted,
+                      color: GodfatherTheme.textLight.withValues(alpha: 0.7),
                     ),
                   ),
                   trailing: Row(
@@ -1296,13 +1296,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                         '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 20,
                           color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
                         ),
                       ),
                       const SizedBox(width: 12),
                       IconButton(
-                        icon: const Icon(Icons.edit, size: 20, color: GodfatherTheme.primaryGold),
+                        icon: const Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
                         onPressed: () => _openEditTransaction(tx),
                         constraints: const BoxConstraints(),
                         padding: EdgeInsets.zero,
@@ -1339,8 +1339,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         backgroundColor: GodfatherTheme.backgroundBlack,
         selectedItemColor: GodfatherTheme.primaryGold,
         unselectedItemColor: GodfatherTheme.textMuted,
-        selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold),
-        unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
+        selectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold),
+        unselectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold),
+        iconSize: 28,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_outlined),
@@ -1441,16 +1442,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                         Text(
                           'Consejero de Finanzas',
                           style: GoogleFonts.inter(
-                            fontSize: 11,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: GodfatherTheme.textMuted,
+                            color: GodfatherTheme.textLight.withValues(alpha: 0.7),
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Caja Chica: S/. ${personalExpenses.toStringAsFixed(0)} / ${budgetLimit.toStringAsFixed(0)}',
                           style: GoogleFonts.inter(
-                            fontSize: 11,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: GodfatherTheme.primaryGold,
                           ),
@@ -1604,13 +1605,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         onTap: onTap,
         leading: Icon(
           icon,
-          color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textMuted,
-          size: 22,
+          color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textLight.withValues(alpha: 0.6),
+          size: 26,
         ),
         title: Text(
           title,
           style: GoogleFonts.cinzel(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
             color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textLight,
             letterSpacing: 1,
@@ -1620,13 +1621,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             ? Text(
                 subtitle,
                 style: GoogleFonts.inter(
-                  fontSize: 10,
-                  color: GodfatherTheme.textMuted,
+                  fontSize: 14,
+                  color: GodfatherTheme.textLight.withValues(alpha: 0.5),
                 ),
               )
             : null,
         trailing: isSelected
-            ? const Icon(Icons.chevron_right, color: GodfatherTheme.primaryGold, size: 16)
+            ? const Icon(Icons.chevron_right, color: GodfatherTheme.primaryGold, size: 20)
             : null,
       ),
     );

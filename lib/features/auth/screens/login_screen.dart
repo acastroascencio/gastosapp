@@ -324,18 +324,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                     'THE GODFATHER',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.displayLarge?.copyWith(
-                      fontSize: 36,
+                      fontSize: 42,
                       letterSpacing: 2,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
                   Text(
                     'Mantén tus finanzas personales y del hogar bajo control',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: GodfatherTheme.textMuted,
+                      color: GodfatherTheme.textLight.withValues(alpha: 0.7),
                       fontStyle: FontStyle.italic,
-                      fontSize: 15,
+                      fontSize: 18,
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -399,7 +399,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                         '¿Olvidaste tu contraseña?',
                         style: TextStyle(
                           color: GodfatherTheme.primaryGold,
-                          fontSize: 13,
+                          fontSize: 16,
                         ),
                       ),
                     ),
@@ -424,14 +424,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
 
                   // Botón de ACCESO DIRECTO premium en oro (bypass)
                   OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: GodfatherTheme.primaryGold,
-                      side: const BorderSide(color: GodfatherTheme.primaryGold, width: 1.5),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -449,7 +441,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                       'ACCESO DIRECTO (DESARROLLADOR)',
                       style: GoogleFonts.cinzel(
                         fontWeight: FontWeight.w700,
-                        fontSize: 12,
+                        fontSize: 14,
                         letterSpacing: 1.5,
                       ),
                     ),
@@ -462,7 +454,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                     children: [
                       const Text(
                         '¿Nuevo en la familia?',
-                        style: TextStyle(color: GodfatherTheme.textMuted, fontSize: 15),
+                        style: TextStyle(color: GodfatherTheme.textLight, fontSize: 17),
                       ),
                       TextButton(
                         onPressed: _isLoading
@@ -478,7 +470,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                           style: TextStyle(
                             color: GodfatherTheme.primaryGold,
                             fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                            fontSize: 17,
                           ),
                         ),
                       ),
