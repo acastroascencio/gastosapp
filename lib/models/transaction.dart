@@ -23,12 +23,18 @@ class Transaction {
   });
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
+    final rawCategory = json['category'] as String;
+    // Normalize 'Teléfono' or 'Teléfono / Internet' to 'Celular' for unification
+    final normalizedCategory = (rawCategory == 'Teléfono' || rawCategory == 'Teléfono / Internet')
+        ? 'Celular'
+        : rawCategory;
+
     return Transaction(
       id: json['id'] as String,
       userId: json['user_id'] as String,
       amount: double.parse(json['amount'].toString()),
       concept: json['concept'] as String,
-      category: json['category'] as String,
+      category: normalizedCategory,
       transactionType: json['transaction_type'] == 'gasto'
           ? TransactionType.gasto
           : TransactionType.abono,

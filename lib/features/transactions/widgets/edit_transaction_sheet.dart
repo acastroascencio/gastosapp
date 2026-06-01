@@ -52,7 +52,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
     CategoryItem('Alquiler', Icons.home),
     CategoryItem('Mantenimiento', Icons.build),
     CategoryItem('Gas', Icons.local_fire_department),
-    CategoryItem('Teléfono', Icons.phone_android),
+    CategoryItem('Celular', Icons.phone_android),
     CategoryItem('Streaming', Icons.tv),
     CategoryItem('Limpieza', Icons.cleaning_services),
     CategoryItem('Compras Casa', Icons.shopping_cart),
@@ -211,7 +211,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
           return 'Gas';
         }
         if (cleanCategory.contains('teléfono') || cleanCategory.contains('telefono') || cleanConcept.contains('teléfono') || cleanConcept.contains('telefono') || cleanConcept.contains('celular') || cleanConcept.contains('movil') || cleanConcept.contains('móvil')) {
-          return 'Teléfono';
+          return 'Celular';
         }
         if (cleanCategory.contains('streaming') || cleanConcept.contains('streaming') || cleanConcept.contains('netflix') || cleanConcept.contains('spotify') || cleanConcept.contains('disney') || cleanConcept.contains('tv')) {
           return 'Streaming';
@@ -464,10 +464,10 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
         Text(
           'CATEGORÍA',
           style: GoogleFonts.inter(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            color: GodfatherTheme.textMuted,
-            letterSpacing: 1.5,
+            fontSize: 13,
+            fontWeight: FontWeight.w900,
+            color: GodfatherTheme.primaryGold,
+            letterSpacing: 1.8,
           ),
         ),
         const SizedBox(height: 12),
@@ -478,7 +478,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
             crossAxisCount: 4,
             crossAxisSpacing: 10,
             mainAxisSpacing: 12,
-            childAspectRatio: 0.95,
+            childAspectRatio: 0.82,
           ),
           itemCount: items.length,
           itemBuilder: (context, index) {
@@ -506,27 +506,36 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
                         ]
                       : null,
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      item.icon,
-                      color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textMuted,
-                      size: 24,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      item.label,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        fontSize: 9.5,
-                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                        color: isSelected ? GodfatherTheme.textLight : GodfatherTheme.textMuted,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        item.icon,
+                        color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textMuted,
+                        size: 26,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            item.label,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                              color: isSelected ? GodfatherTheme.textLight : GodfatherTheme.textMuted,
+                              height: 1.1,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );

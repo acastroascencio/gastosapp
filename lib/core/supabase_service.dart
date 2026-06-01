@@ -104,7 +104,7 @@ class TransactionNotifier extends StateNotifier<AsyncValue<List<model.Transactio
     SeedItem('LUZ SURCO', 'Luz', 969.6),
     SeedItem('GAS CHORRILLOS 01', 'Gas', 22.0),
     SeedItem('GAS CHORRILLOS 02', 'Gas', 33.0),
-    SeedItem('MOVISTAR SURCO', 'Teléfono / Internet', 126.67),
+    SeedItem('MOVISTAR SURCO', 'Celular', 126.67),
     SeedItem('SAGA', 'Compras / Crédito', 158.0),
     SeedItem('CELULAR BRENDA', 'Celular', 29.0),
     SeedItem('CELULAR MARIO', 'Celular', 62.0),
