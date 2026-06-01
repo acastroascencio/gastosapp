@@ -20,12 +20,10 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentTabIndex = 0; // 0: Dashboard, 1: Gastos Personales, 2: Gastos de Casa, 3: Reportes
-  bool _showSelection = false; // Controla si se muestran las tarjetas GASTE/ABONE o el botón AGREGAR GASTO
+
   
   // Animaciones para las transiciones
-  late AnimationController _pulseController;
   late AnimationController _fadeController;
-  late Animation<double> _pulseAnimation;
   late Animation<double> _fadeAnimation;
 
   // Timer para la hora en tiempo real del header
@@ -56,14 +54,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     _updateDateTime();
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateDateTime());
 
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
 
-    _pulseAnimation = Tween<double>(begin: 0.98, end: 1.02).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
 
     _fadeController = AnimationController(
       vsync: this,
@@ -79,7 +70,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   @override
   void dispose() {
     _timer.cancel();
-    _pulseController.dispose();
     _fadeController.dispose();
     super.dispose();
   }
@@ -103,10 +93,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
       context: context,
       isScrollControlled: true,
       builder: (context) => AddTransactionSheet(defaultType: type),
-    ).then((_) {
-      // Regresar al botón principal después de guardar
-      setState(() => _showSelection = false);
-    });
+    );
   }
 
   // Abre el selector de presupuesto mensual
@@ -633,111 +620,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         
         const Spacer(),
 
-        // INTERACCIÓN DE BOTONES (AGREGAR GASTO VS GASTE/ABONE)
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 350),
-          transitionBuilder: (Widget child, Animation<double> animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: ScaleTransition(scale: animation, child: child),
-            );
-          },
-          child: !_showSelection
-              ? _buildSingleAddButton()
-              : _buildDualCardSelection(),
-        ),
+        // INTERACCIÓN DE BOTONES (GASTO Y ABONE DIRECTAMENTE)
+        _buildDualCardSelection(),
 
         const Spacer(flex: 2),
       ],
     );
   }
 
-  // BOTÓN INICIAL "AGREGAR GASTO" (GIANT CIRCULAR BUTTON CON DOUBLE BORDER Y GRADIENTE METÁLICO)
-  Widget _buildSingleAddButton() {
-    return ScaleTransition(
-      scale: _pulseAnimation,
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _showSelection = true;
-          });
-        },
-        child: Container(
-          width: 160,
-          height: 160,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: GodfatherTheme.primaryGold.withOpacity(0.35),
-                blurRadius: 25,
-                spreadRadius: 3,
-              ),
-            ],
-            gradient: const LinearGradient(
-              colors: [
-                Color(0xFFF3E5AB),
-                Color(0xFFD4AF37),
-                Color(0xFF996515),
-                Color(0xFFF5D77F),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          padding: const EdgeInsets.all(4.5), // Anillo exterior
-          child: Container(
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: GodfatherTheme.backgroundBlack,
-            ),
-            padding: const EdgeInsets.all(3.0),
-            child: Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFF0D0D10),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'AGREGAR',
-                      style: GoogleFonts.cinzel(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w900,
-                        color: GodfatherTheme.primaryGold,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'GASTO',
-                      style: GoogleFonts.cinzel(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
-                        color: GodfatherTheme.primaryGold,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    Text(
-                      'U ABONO',
-                      style: GoogleFonts.cinzel(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
-                        color: GodfatherTheme.primaryGold,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   // VISTA DE SELECCIÓN CON DOS TARJETAS (GASTE / ABONE) Y BOTÓN VOLVER
   Widget _buildDualCardSelection() {
@@ -779,9 +669,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         // BOTÓN VOLVER ENORME Y PERFECTAMENTE VISIBLE
         GestureDetector(
           onTap: () {
-            setState(() {
-              _showSelection = false;
-            });
+            // Randomiza las imágenes de los personajes para un toque interactivo
+            _changeGastoImage();
+            _changeAboneImage();
           },
           child: Container(
             width: 96, // 96x96px
@@ -1123,8 +1013,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         onTap: (index) {
           setState(() {
             _currentTabIndex = index;
-            // Ocultar la selección si cambiamos de tab
-            _showSelection = false;
           });
           _fadeController.reset();
           _fadeController.forward();
@@ -1269,7 +1157,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       Navigator.pop(context);
                       setState(() {
                         _currentTabIndex = 0;
-                        _showSelection = false;
                       });
                       _fadeController.reset();
                       _fadeController.forward();
@@ -1284,7 +1171,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       Navigator.pop(context);
                       setState(() {
                         _currentTabIndex = 1;
-                        _showSelection = false;
                       });
                       _fadeController.reset();
                       _fadeController.forward();
@@ -1299,7 +1185,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       Navigator.pop(context);
                       setState(() {
                         _currentTabIndex = 2;
-                        _showSelection = false;
                       });
                       _fadeController.reset();
                       _fadeController.forward();
@@ -1314,7 +1199,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       Navigator.pop(context);
                       setState(() {
                         _currentTabIndex = 3;
-                        _showSelection = false;
                       });
                       _fadeController.reset();
                       _fadeController.forward();
