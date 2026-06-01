@@ -34,15 +34,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   String _localBypassName = 'DON CORLEONE';
 
   final List<String> _aboneImages = [
-    'assets/images/FINAL/04.png',
-    'assets/images/FINAL/05.png',
-    'assets/images/FINAL/06.png',
-  ];
-
-  final List<String> _gastoImages = [
     'assets/images/FINAL/01.png',
     'assets/images/FINAL/02.png',
     'assets/images/FINAL/03.png',
+  ];
+
+  final List<String> _gastoImages = [
+    'assets/images/FINAL/04.png',
+    'assets/images/FINAL/05.png',
+    'assets/images/FINAL/06.png',
   ];
 
   late String _currentGastoImagePath;
