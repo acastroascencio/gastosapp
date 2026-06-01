@@ -22,12 +22,10 @@ class GodfatherTheme {
         primary: primaryGold,
         secondary: secondaryGold,
         surface: surfaceDark,
-        background: backgroundBlack,
         error: alertRed,
         onPrimary: backgroundBlack,
         onSecondary: textLight,
         onSurface: textLight,
-        onBackground: textLight,
       ),
       textTheme: TextTheme(
         displayLarge: GoogleFonts.cinzel(

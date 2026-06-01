@@ -21,6 +21,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentTabIndex = 0; // 0: Dashboard, 1: Gastos Personales, 2: Gastos de Casa, 3: Reportes
+  DateTime _selectedDate = DateTime.now(); // Controla el mes seleccionado en la app
 
   
   // Animaciones para las transiciones
@@ -145,7 +146,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 final newLimit = double.tryParse(controller.text.trim());
                 if (newLimit != null && newLimit >= 0) {
                   await ref.read(budgetProvider.notifier).setBudget(newLimit);
-                  if (mounted) Navigator.pop(context);
+                  if (context.mounted) Navigator.pop(context);
                 }
               },
               child: const Text('GUARDAR'),
@@ -246,7 +247,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   if (user != null) {
                     // Si está autenticado con Supabase, guardar en BD
                     await ref.read(profileProvider.notifier).updateProfile(newName);
-                    if (mounted) {
+                    if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Perfil de Supabase sincronizado con éxito, Don Corleone.'),
@@ -259,7 +260,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     setState(() {
                       _localBypassName = newName;
                     });
-                    if (mounted) {
+                    if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Perfil de desarrollador actualizado con éxito.'),
@@ -268,9 +269,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       );
                     }
                   }
-                  if (mounted) Navigator.pop(context);
+                  if (context.mounted) Navigator.pop(context);
                 } catch (e) {
-                  if (mounted) {
+                  if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Error al guardar perfil: $e'),
@@ -340,27 +341,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           ),
           data: (transactions) {
             final budgetLimit = budgetAsync.value?.limitAmount ?? 200.0;
-            final now = DateTime.now();
 
-            // Filtrar transacciones del mes
+            // Filtrar transacciones del mes seleccionado
             final currentMonthTransactions = transactions.where((tx) {
-              return tx.createdAt.month == now.month && tx.createdAt.year == now.year;
+              return tx.createdAt.month == _selectedDate.month && tx.createdAt.year == _selectedDate.year;
             }).toList();
 
-            // Cálculos
+            // Cálculos del mes seleccionado (usando valores absolutos)
             final personalExpenses = currentMonthTransactions
                 .where((tx) => tx.targetModule == TargetModule.personal && tx.transactionType == TransactionType.gasto)
-                .fold(0.0, (sum, tx) => sum + tx.amount);
-
-            final houseIncomes = currentMonthTransactions
-                .where((tx) => tx.targetModule == TargetModule.casa && tx.transactionType == TransactionType.abono)
-                .fold(0.0, (sum, tx) => sum + tx.amount);
-
-            final houseExpenses = currentMonthTransactions
-                .where((tx) => tx.targetModule == TargetModule.casa && tx.transactionType == TransactionType.gasto)
-                .fold(0.0, (sum, tx) => sum + tx.amount);
-
-            final houseBalance = houseIncomes - houseExpenses;
+                .fold(0.0, (sum, tx) => sum + tx.amount.abs());
 
             return Column(
               children: [
@@ -377,11 +367,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                         child: _buildTabContent(
                           tabIndex: _currentTabIndex,
                           transactions: transactions,
-                          personalExpenses: personalExpenses,
                           budgetLimit: budgetLimit,
-                          houseIncomes: houseIncomes,
-                          houseExpenses: houseExpenses,
-                          houseBalance: houseBalance,
                         ),
                       );
                     },
@@ -464,7 +450,70 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               letterSpacing: 0.5,
             ),
           ),
+          if (_currentTabIndex != 0) ...[
+            const SizedBox(height: 12),
+            _buildMonthSelector(),
+          ],
         ],
+      ),
+    );
+  }
+
+  // Bar de meses en cápsulas estilizadas
+  Widget _buildMonthSelector() {
+    final List<MapEntry<int, String>> months = const [
+      MapEntry(1, 'Ene'),
+      MapEntry(2, 'Feb'),
+      MapEntry(3, 'Mar'),
+      MapEntry(4, 'Abr'),
+      MapEntry(5, 'May'),
+      MapEntry(6, 'Jun'),
+      MapEntry(7, 'Jul'),
+      MapEntry(8, 'Ago'),
+      MapEntry(9, 'Sep'),
+      MapEntry(10, 'Oct'),
+      MapEntry(11, 'Nov'),
+      MapEntry(12, 'Dic'),
+    ];
+
+    return SizedBox(
+      height: 38,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: months.length,
+        itemBuilder: (context, index) {
+          final entry = months[index];
+          final isSelected = _selectedDate.month == entry.key;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: ChoiceChip(
+              showCheckmark: false,
+              label: Text(entry.value.toUpperCase()),
+              selected: isSelected,
+              selectedColor: GodfatherTheme.primaryGold.withValues(alpha: 0.25),
+              backgroundColor: const Color(0xFF131316),
+              labelStyle: TextStyle(
+                color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textMuted,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+              side: BorderSide(
+                color: isSelected ? GodfatherTheme.primaryGold : const Color(0xFF2C2C30),
+                width: isSelected ? 1.5 : 1.0,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              onSelected: (selected) {
+                if (selected) {
+                  setState(() {
+                    _selectedDate = DateTime(2026, entry.key, 1);
+                  });
+                }
+              },
+            ),
+          );
+        },
       ),
     );
   }
@@ -473,22 +522,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   Widget _buildTabContent({
     required int tabIndex,
     required List<Transaction> transactions,
-    required double personalExpenses,
     required double budgetLimit,
-    required double houseIncomes,
-    required double houseExpenses,
-    required double houseBalance,
   }) {
     switch (tabIndex) {
       case 0:
+        final personalExpenses = transactions
+            .where((tx) =>
+                tx.targetModule == TargetModule.personal &&
+                tx.transactionType == TransactionType.gasto &&
+                tx.createdAt.month == _selectedDate.month &&
+                tx.createdAt.year == _selectedDate.year)
+            .fold(0.0, (sum, tx) => sum + tx.amount.abs());
         return _buildDashboardView(personalExpenses, budgetLimit);
       case 1:
-        return _buildPersonalExpensesView(personalExpenses, budgetLimit, transactions);
+        return _buildPersonalExpensesView(budgetLimit, transactions);
       case 2:
-        return _buildHouseExpensesView(houseIncomes, houseExpenses, houseBalance, transactions);
+        return _buildHouseExpensesView(transactions);
       case 3:
         return const ReportsScreen();
       default:
+        final personalExpenses = transactions
+            .where((tx) =>
+                tx.targetModule == TargetModule.personal &&
+                tx.transactionType == TransactionType.gasto &&
+                tx.createdAt.month == _selectedDate.month &&
+                tx.createdAt.year == _selectedDate.year)
+            .fold(0.0, (sum, tx) => sum + tx.amount.abs());
         return _buildDashboardView(personalExpenses, budgetLimit);
     }
   }
@@ -779,9 +838,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   }
 
   // TAB 1: DETALLE DE GASTOS PERSONALES (CAJA CHICA)
-  Widget _buildPersonalExpensesView(double spent, double limit, List<Transaction> transactions) {
-    final personalTxs = transactions.where((tx) => tx.targetModule == TargetModule.personal).toList();
-    final spentPercentage = limit > 0 ? (spent / limit) : 0.0;
+  Widget _buildPersonalExpensesView(double limit, List<Transaction> transactions) {
+    // Filter personal transactions of the selected month
+    final personalTxs = transactions.where((tx) {
+      return tx.targetModule == TargetModule.personal &&
+             tx.createdAt.month == _selectedDate.month &&
+             tx.createdAt.year == _selectedDate.year;
+    }).toList();
+
+    // Calculations
+    final personalExpenses = personalTxs
+        .where((tx) => tx.transactionType == TransactionType.gasto)
+        .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+
+    final personalIncomes = personalTxs
+        .where((tx) => tx.transactionType == TransactionType.abono)
+        .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+
+    // Balance/Disponible
+    final disponible = (limit + personalIncomes - personalExpenses).clamp(0.0, double.infinity);
+    final spentPercentage = limit > 0 ? (personalExpenses / limit) : 0.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20.0),
@@ -812,19 +888,73 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
+                  
+                  // Gastos del mes
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      const Text('Gastos del mes:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
                       Text(
-                        'S/. ${spent.toStringAsFixed(2)}',
+                        'S/. ${personalExpenses.toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
-                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: spentPercentage >= 1.0 ? GodfatherTheme.alertRed : GodfatherTheme.textLight,
+                          fontSize: 15,
                         ),
                       ),
-                      Text('Límite: S/. ${limit.toStringAsFixed(2)}'),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Caja chica consumida
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Caja chica consumida:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
+                      Text(
+                        'S/. ${personalExpenses.toStringAsFixed(2)}',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold,
+                          color: spentPercentage >= 1.0 ? GodfatherTheme.alertRed : GodfatherTheme.textLight,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Límite de caja chica
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Límite de caja chica:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
+                      Text(
+                        'S/. ${limit.toStringAsFixed(2)}',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold,
+                          color: GodfatherTheme.textLight,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const Divider(height: 24, color: Color(0xFF2C2C30)),
+
+                  // Saldo disponible
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Saldo disponible:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        'S/. ${disponible.toStringAsFixed(2)}',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: disponible > 0 ? GodfatherTheme.successGreen : GodfatherTheme.alertRed,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -903,15 +1033,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   }
 
   // TAB 2: DETALLE DE GASTOS DE LA CASA
-  Widget _buildHouseExpensesView(double income, double expenses, double balance, List<Transaction> transactions) {
-    final houseTxs = transactions.where((tx) => tx.targetModule == TargetModule.casa).toList();
+  Widget _buildHouseExpensesView(List<Transaction> transactions) {
+    // Filter house transactions of the selected month
+    final houseTxs = transactions.where((tx) {
+      return tx.targetModule == TargetModule.casa &&
+             tx.createdAt.month == _selectedDate.month &&
+             tx.createdAt.year == _selectedDate.year;
+    }).toList();
+
+    // Calculations (using absolute values to sum correctly)
+    final houseExpenses = houseTxs
+        .where((tx) => tx.transactionType == TransactionType.gasto)
+        .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+
+    final houseIncomes = houseTxs
+        .where((tx) => tx.transactionType == TransactionType.abono)
+        .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+
+    final houseBalance = houseIncomes - houseExpenses;
+
+    // Count of services pagados (expenses in house scope)
+    final servicesCount = houseTxs
+        .where((tx) => tx.transactionType == TransactionType.gasto)
+        .length;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Tarjeta de balance
+          // Tarjeta de balance inteligente
           Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -927,44 +1078,70 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     style: TextStyle(fontWeight: FontWeight.bold, color: GodfatherTheme.primaryGold),
                   ),
                   const SizedBox(height: 16),
+                  
+                  // Abonos del mes
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Abonos (Familia)', style: TextStyle(fontSize: 11)),
-                          const SizedBox(height: 4),
-                          Text(
-                            'S/. ${income.toStringAsFixed(2)}',
-                            style: const TextStyle(color: GodfatherTheme.successGreen, fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Servicios Pagados', style: TextStyle(fontSize: 11)),
-                          const SizedBox(height: 4),
-                          Text(
-                            'S/. ${expenses.toStringAsFixed(2)}',
-                            style: const TextStyle(color: GodfatherTheme.alertRed, fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
-                        ],
+                      const Text('Abonos del mes:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
+                      Text(
+                        'S/. ${houseIncomes.toStringAsFixed(2)}',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold,
+                          color: GodfatherTheme.successGreen,
+                          fontSize: 15,
+                        ),
                       ),
                     ],
                   ),
-                  const Divider(height: 24, color: Color(0xFF2C2C30)),
+                  const SizedBox(height: 8),
+
+                  // Gastos del mes
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Saldo Restante', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text('Gastos del mes:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
                       Text(
-                        'S/. ${balance.toStringAsFixed(2)}',
+                        'S/. ${houseExpenses.toStringAsFixed(2)}',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold,
+                          color: GodfatherTheme.alertRed,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Servicios pagados count
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Servicios pagados:', style: TextStyle(fontSize: 13, color: GodfatherTheme.textMuted)),
+                      Text(
+                        '$servicesCount',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold,
+                          color: GodfatherTheme.primaryGold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const Divider(height: 24, color: Color(0xFF2C2C30)),
+
+                  // Saldo restante
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Saldo restante:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        '${houseBalance < 0 ? "-" : ""}S/. ${houseBalance.abs().toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
-                          color: balance >= 0 ? GodfatherTheme.primaryGold : GodfatherTheme.alertRed,
+                          color: houseBalance >= 0 ? GodfatherTheme.primaryGold : GodfatherTheme.alertRed,
                         ),
                       ),
                     ],
