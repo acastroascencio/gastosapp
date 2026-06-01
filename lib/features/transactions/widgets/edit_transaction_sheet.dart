@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:remixicon/remixicon.dart';
 import '../../../core/theme.dart';
 import '../../../core/supabase_service.dart';
 import '../../../models/transaction.dart';
@@ -45,45 +46,45 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
 
   // Grids of category icons for each of the 4 combinations
   static const List<CategoryItem> _gastoCasaCategories = [
-    CategoryItem('Internet', Icons.wifi),
-    CategoryItem('Luz', Icons.lightbulb_outline),
-    CategoryItem('Agua', Icons.water_drop),
-    CategoryItem('Seguridad', Icons.security),
-    CategoryItem('Alquiler', Icons.home),
-    CategoryItem('Mantenimiento', Icons.build),
-    CategoryItem('Gas', Icons.local_fire_department),
-    CategoryItem('Celular', Icons.phone_android),
-    CategoryItem('Streaming', Icons.tv),
-    CategoryItem('Limpieza', Icons.cleaning_services),
-    CategoryItem('Compras Casa', Icons.shopping_cart),
-    CategoryItem('Otros', Icons.more_horiz),
+    CategoryItem('Internet', RemixIcons.wifi_fill),
+    CategoryItem('Luz', RemixIcons.lightbulb_fill),
+    CategoryItem('Agua', RemixIcons.drop_fill),
+    CategoryItem('Seguridad', RemixIcons.shield_check_fill),
+    CategoryItem('Alquiler', RemixIcons.home_4_fill),
+    CategoryItem('Mantenimiento', RemixIcons.tools_fill),
+    CategoryItem('Gas', RemixIcons.fire_fill),
+    CategoryItem('Celular', RemixIcons.smartphone_fill),
+    CategoryItem('Streaming', RemixIcons.tv_fill),
+    CategoryItem('Limpieza', RemixIcons.brush_fill),
+    CategoryItem('Compras Casa', RemixIcons.shopping_cart_fill),
+    CategoryItem('Otros', RemixIcons.more_fill),
   ];
 
   static const List<CategoryItem> _gastoPersonalCategories = [
-    CategoryItem('Comida', Icons.restaurant),
-    CategoryItem('Transporte', Icons.directions_car),
-    CategoryItem('Salud', Icons.medical_services),
-    CategoryItem('Ocio', Icons.sports_esports),
-    CategoryItem('Educación', Icons.school),
-    CategoryItem('Ropa', Icons.checkroom),
-    CategoryItem('Mascotas', Icons.pets),
-    CategoryItem('Otros', Icons.more_horiz),
+    CategoryItem('Comida', RemixIcons.restaurant_fill),
+    CategoryItem('Transporte', RemixIcons.car_fill),
+    CategoryItem('Salud', RemixIcons.first_aid_kit_fill),
+    CategoryItem('Ocio', RemixIcons.gamepad_fill),
+    CategoryItem('Educación', RemixIcons.graduation_cap_fill),
+    CategoryItem('Ropa', RemixIcons.shirt_fill),
+    CategoryItem('Mascotas', RemixIcons.bear_smile_fill),
+    CategoryItem('Otros', RemixIcons.more_fill),
   ];
 
   static const List<CategoryItem> _abonoCasaCategories = [
-    CategoryItem('Aporte mensual', Icons.calendar_month),
-    CategoryItem('Reembolso', Icons.replay),
-    CategoryItem('Fondo común', Icons.groups),
-    CategoryItem('Pago comp.', Icons.share),
-    CategoryItem('Otro', Icons.more_horiz),
+    CategoryItem('Aporte mensual', RemixIcons.calendar_fill),
+    CategoryItem('Reembolso', RemixIcons.refund_fill),
+    CategoryItem('Fondo común', RemixIcons.team_fill),
+    CategoryItem('Pago comp.', RemixIcons.share_fill),
+    CategoryItem('Otro', RemixIcons.more_fill),
   ];
 
   static const List<CategoryItem> _abonoPersonalCategories = [
-    CategoryItem('Sueldo', Icons.work),
-    CategoryItem('Extra', Icons.add_circle),
-    CategoryItem('Reembolso', Icons.replay),
-    CategoryItem('Venta', Icons.storefront),
-    CategoryItem('Otro', Icons.more_horiz),
+    CategoryItem('Sueldo', RemixIcons.briefcase_fill),
+    CategoryItem('Extra', RemixIcons.add_circle_fill),
+    CategoryItem('Reembolso', RemixIcons.refund_fill),
+    CategoryItem('Venta', RemixIcons.store_fill),
+    CategoryItem('Otro', RemixIcons.more_fill),
   ];
 
   @override
@@ -476,7 +477,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 110,
-            mainAxisExtent: 90, // Uniform 90px height
+            mainAxisExtent: 98, // Uniform height for senior chips
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
           ),
@@ -484,54 +485,69 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
           itemBuilder: (context, index) {
             final item = items[index];
             final isSelected = selectedCategory == item.label;
+            final visuals = GodfatherTheme.getCategoryVisuals(item.label);
             return GestureDetector(
               onTap: () => onSelected(item.label),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeInOut,
                 decoration: BoxDecoration(
-                  color: isSelected ? themeColor.withValues(alpha: 0.12) : GodfatherTheme.surfaceDarkAlt,
-                  borderRadius: BorderRadius.circular(14),
+                  color: isSelected 
+                      ? visuals.bgColor.withValues(alpha: 0.25) 
+                      : GodfatherTheme.surfaceDark,
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.borderColor,
-                    width: isSelected ? 2.5 : 1.2,
+                    color: isSelected 
+                        ? (ref.watch(themeModeProvider) == ThemeMode.dark ? GodfatherTheme.goldActive : GodfatherTheme.primaryGold)
+                        : GodfatherTheme.borderColor,
+                    width: isSelected ? 3.0 : 1.5,
                   ),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: GodfatherTheme.primaryGold.withValues(alpha: 0.15),
-                            blurRadius: 6,
-                            spreadRadius: 0.5,
+                            color: visuals.color.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            spreadRadius: 1.0,
                           )
                         ]
                       : null,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(
-                        item.icon,
-                        color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.iconColor,
-                        size: 36,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        item.label,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: GodfatherTheme.textLight,
-                          height: 1.1,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: visuals.bgColor,
+                        border: Border.all(
+                          color: visuals.color.withValues(alpha: 0.45),
+                          width: 1.5,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        visuals.icon,
+                        color: visuals.color,
+                        size: 34,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      item.label,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: GodfatherTheme.textLight,
+                        height: 1.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
             );

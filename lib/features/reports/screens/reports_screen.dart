@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:remixicon/remixicon.dart';
 import '../../../core/theme.dart';
 import '../../../core/supabase_service.dart';
 import '../../../models/transaction.dart';
@@ -44,15 +45,15 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+          icon: const Icon(RemixIcons.arrow_left_s_line, size: 24),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
             icon: Icon(
               ref.watch(themeModeProvider) == ThemeMode.dark
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
+                  ? RemixIcons.sun_fill
+                  : RemixIcons.moon_fill,
               color: GodfatherTheme.primaryGold,
               size: 28,
             ),
@@ -300,39 +301,81 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                       final tx = moduleTransactions[index];
                       final isExpense = tx.transactionType == TransactionType.gasto;
                       
-                      return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
-                        leading: Container(
-                          padding: const EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
-                            color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            isExpense ? Icons.arrow_downward_outlined : Icons.arrow_upward_outlined,
-                            color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                            size: 28,
-                          ),
-                        ),
-                        title: Text(
-                          tx.concept,
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.bold,
-                            color: GodfatherTheme.textLight,
-                            fontSize: 20,
-                          ),
-                        ),
-                        subtitle: Text(
-                          '${tx.category} • ${DateFormat('dd MMM').format(tx.createdAt)}',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: GodfatherTheme.textLight.withValues(alpha: 0.7)),
-                        ),
-                        trailing: Text(
-                          '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.bold,
-                            color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                            fontSize: 22,
-                          ),
+                      final visuals = GodfatherTheme.getCategoryVisuals(tx.category);
+                      return Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14.0),
+                        constraints: const BoxConstraints(minHeight: 72),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: visuals.bgColor,
+                                border: Border.all(
+                                  color: visuals.color.withValues(alpha: 0.45),
+                                  width: 1.5,
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: Icon(
+                                visuals.icon,
+                                color: visuals.color,
+                                size: 26,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    tx.concept,
+                                    style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 19,
+                                      color: GodfatherTheme.textLight,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${tx.category} • ${DateFormat('dd MMM').format(tx.createdAt)}',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: GodfatherTheme.textLight.withValues(alpha: 0.8),
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.3),
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: Text(
+                                '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 20,
+                                  color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     },

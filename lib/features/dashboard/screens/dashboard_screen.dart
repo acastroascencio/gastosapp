@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:remixicon/remixicon.dart';
 import '../../../core/theme.dart';
 import '../../../core/supabase_service.dart';
 import '../../../models/transaction.dart';
@@ -106,67 +107,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     );
   }
 
-  IconData _getCategoryIcon(String category, TransactionType type) {
-    switch (category) {
-      case 'Internet':
-        return Icons.wifi;
-      case 'Luz':
-        return Icons.lightbulb_outline;
-      case 'Agua':
-        return Icons.water_drop;
-      case 'Seguridad':
-        return Icons.security;
-      case 'Alquiler':
-        return Icons.home;
-      case 'Mantenimiento':
-        return Icons.build;
-      case 'Gas':
-        return Icons.local_fire_department;
-      case 'Celular':
-      case 'Teléfono':
-        return Icons.phone_android;
-      case 'Streaming':
-        return Icons.tv;
-      case 'Limpieza':
-        return Icons.cleaning_services;
-      case 'Compras Casa':
-        return Icons.shopping_cart;
-      case 'Comida':
-        return Icons.restaurant;
-      case 'Transporte':
-        return Icons.directions_car;
-      case 'Salud':
-        return Icons.medical_services;
-      case 'Ocio':
-        return Icons.sports_esports;
-      case 'Educación':
-        return Icons.school;
-      case 'Ropa':
-        return Icons.checkroom;
-      case 'Mascotas':
-        return Icons.pets;
-      case 'Aporte mensual':
-        return Icons.calendar_month;
-      case 'Reembolso':
-        return Icons.replay;
-      case 'Fondo común':
-        return Icons.groups;
-      case 'Pago comp.':
-      case 'Pago compartido':
-        return Icons.share;
-      case 'Sueldo':
-        return Icons.work;
-      case 'Extra':
-        return Icons.add_circle;
-      case 'Venta':
-        return Icons.storefront;
-      case 'Otros':
-      case 'Otro':
-        return Icons.more_horiz;
-      default:
-        return type == TransactionType.gasto ? Icons.arrow_downward : Icons.arrow_upward;
-    }
-  }
 
   // Abre el selector de presupuesto mensual
   void _showConfigureBudgetDialog(double currentLimit) {
@@ -479,7 +419,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             children: [
               // Hamburguesa de menú dorada
               IconButton(
-                icon: Icon(Icons.menu, color: GodfatherTheme.primaryGold, size: 24),
+                icon: Icon(RemixIcons.menu_fill, color: GodfatherTheme.primaryGold, size: 24),
                 onPressed: () {
                   // Abre el Drawer lateral premium
                   _scaffoldKey.currentState?.openDrawer();
@@ -502,8 +442,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   IconButton(
                     icon: Icon(
                       ref.watch(themeModeProvider) == ThemeMode.dark
-                          ? Icons.light_mode
-                          : Icons.dark_mode,
+                          ? RemixIcons.sun_fill
+                          : RemixIcons.moon_fill,
                       color: GodfatherTheme.primaryGold,
                       size: 24,
                     ),
@@ -512,7 +452,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.settings, color: GodfatherTheme.primaryGold, size: 24),
+                    icon: Icon(RemixIcons.settings_fill, color: GodfatherTheme.primaryGold, size: 24),
                     onPressed: _showEditProfileDialog,
                   ),
                 ],
@@ -1076,53 +1016,93 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             itemBuilder: (context, index) {
               final tx = personalTxs[index];
               final isExpense = tx.transactionType == TransactionType.gasto;
-              return ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
-                leading: Container(
-                  padding: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    _getCategoryIcon(tx.category, tx.transactionType),
-                    color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                    size: 28,
-                  ),
-                ),
-                title: Text(
-                  tx.concept,
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: GodfatherTheme.textLight,
-                  ),
-                ),
-                subtitle: Text(
-                  tx.category,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: GodfatherTheme.textLight.withValues(alpha: 0.7),
-                  ),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
+              final visuals = GodfatherTheme.getCategoryVisuals(tx.category);
+              return Container(
+                padding: const EdgeInsets.symmetric(vertical: 14.0),
+                constraints: const BoxConstraints(minHeight: 72),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                        color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: visuals.bgColor,
+                        border: Border.all(
+                          color: visuals.color.withValues(alpha: 0.45),
+                          width: 1.5,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        visuals.icon,
+                        color: visuals.color,
+                        size: 26,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            tx.concept,
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 19,
+                              color: GodfatherTheme.textLight,
+                              height: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            tx.category,
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: GodfatherTheme.textLight.withValues(alpha: 0.8),
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: 12),
-                    IconButton(
-                      icon: Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
-                      onPressed: () => _openEditTransaction(tx),
-                      constraints: const BoxConstraints(),
-                      padding: EdgeInsets.zero,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.3),
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Text(
+                            '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 20,
+                              color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        IconButton(
+                          icon: const Icon(RemixIcons.pencil_fill, size: 24),
+                          color: GodfatherTheme.primaryGold,
+                          onPressed: () => _openEditTransaction(tx),
+                          constraints: const BoxConstraints(),
+                          padding: EdgeInsets.zero,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1310,53 +1290,93 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             itemBuilder: (context, index) {
               final tx = houseTxs[index];
               final isExpense = tx.transactionType == TransactionType.gasto;
-              return ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
-                leading: Container(
-                  padding: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    _getCategoryIcon(tx.category, tx.transactionType),
-                    color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                    size: 28,
-                  ),
-                ),
-                title: Text(
-                  tx.concept,
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: GodfatherTheme.textLight,
-                  ),
-                ),
-                subtitle: Text(
-                  tx.category,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: GodfatherTheme.textLight.withValues(alpha: 0.7),
-                  ),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
+              final visuals = GodfatherTheme.getCategoryVisuals(tx.category);
+              return Container(
+                padding: const EdgeInsets.symmetric(vertical: 14.0),
+                constraints: const BoxConstraints(minHeight: 72),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                        color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: visuals.bgColor,
+                        border: Border.all(
+                          color: visuals.color.withValues(alpha: 0.45),
+                          width: 1.5,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        visuals.icon,
+                        color: visuals.color,
+                        size: 26,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            tx.concept,
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 19,
+                              color: GodfatherTheme.textLight,
+                              height: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            tx.category,
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: GodfatherTheme.textLight.withValues(alpha: 0.8),
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: 12),
-                    IconButton(
-                      icon: Icon(Icons.edit, size: 24, color: GodfatherTheme.primaryGold),
-                      onPressed: () => _openEditTransaction(tx),
-                      constraints: const BoxConstraints(),
-                      padding: EdgeInsets.zero,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.3),
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Text(
+                            '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 20,
+                              color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        IconButton(
+                          icon: const Icon(RemixIcons.pencil_fill, size: 24),
+                          color: GodfatherTheme.primaryGold,
+                          onPressed: () => _openEditTransaction(tx),
+                          constraints: const BoxConstraints(),
+                          padding: EdgeInsets.zero,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1427,25 +1447,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         selectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold),
         unselectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold),
         iconSize: 28,
-        items: [
+        items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            activeIcon: Icon(Icons.dashboard, color: GodfatherTheme.primaryGold),
+            icon: Icon(RemixIcons.dashboard_line),
+            activeIcon: Icon(RemixIcons.dashboard_fill),
             label: 'Dashboard',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person, color: GodfatherTheme.primaryGold),
-            label: 'Gastos Personales',
+            icon: Icon(RemixIcons.user_3_line),
+            activeIcon: Icon(RemixIcons.user_3_fill),
+            label: 'Personales',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home, color: GodfatherTheme.primaryGold),
-            label: 'Gastos de Casa',
+            icon: Icon(RemixIcons.home_4_line),
+            activeIcon: Icon(RemixIcons.home_4_fill),
+            label: 'De Casa',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pie_chart_outline),
-            activeIcon: Icon(Icons.pie_chart, color: GodfatherTheme.primaryGold),
+            icon: Icon(RemixIcons.pie_chart_line),
+            activeIcon: Icon(RemixIcons.pie_chart_fill),
             label: 'Reportes',
           ),
         ],
