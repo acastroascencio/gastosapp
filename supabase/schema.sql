@@ -20,6 +20,11 @@ CREATE POLICY "Los usuarios pueden actualizar su propio perfil"
 ON public.profiles FOR UPDATE 
 USING (auth.uid() = id);
 
+CREATE POLICY "Los usuarios pueden insertar su propio perfil"
+ON public.profiles FOR INSERT
+WITH CHECK (auth.uid() = id);
+
+
 -- 2. TABLA: families
 CREATE TABLE public.families (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

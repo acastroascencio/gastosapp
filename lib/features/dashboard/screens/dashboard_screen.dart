@@ -571,14 +571,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   _scaffoldKey.currentState?.openDrawer();
                 },
               ),
-              // Título central
-              Text(
-                tabTitle,
-                style: GoogleFonts.cinzel(
-                  fontSize: 25, // Aumentado para mayor visibilidad
-                  fontWeight: FontWeight.w800,
-                  color: GodfatherTheme.primaryGold,
-                  letterSpacing: 2.0,
+              // Título central flexible y adaptable a móviles para evitar RenderFlex overflow
+              Flexible(
+                child: Text(
+                  tabTitle,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.cinzel(
+                    fontSize: MediaQuery.of(context).size.width < 450 ? 18 : 25,
+                    fontWeight: FontWeight.w800,
+                    color: GodfatherTheme.primaryGold,
+                    letterSpacing: MediaQuery.of(context).size.width < 450 ? 0.8 : 2.0,
+                  ),
                 ),
               ),
               // Theme Toggle button next to Settings engrane
@@ -1862,6 +1867,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
              tx.createdAt.year == now.year;
     }).fold(0.0, (sum, tx) => sum + tx.amount);
 
+    final user = ref.watch(currentUserProvider);
+    final googlePhotoUrl = user?.userMetadata?['avatar_url'] as String? ?? user?.userMetadata?['picture'] as String?;
+
     return Drawer(
       child: Container(
         color: GodfatherTheme.backgroundBlack,
@@ -1893,19 +1901,48 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       ],
                     ),
                     child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/godfather_asistente.png',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'assets/images/godfather_asistente.jpg',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.person, color: GodfatherTheme.primaryGold, size: 30);
-                            },
-                          );
-                        },
-                      ),
+                      child: googlePhotoUrl != null && googlePhotoUrl.isNotEmpty
+                          ? Image.network(
+                              googlePhotoUrl,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation(GodfatherTheme.primaryGold),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/godfather_asistente.png',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/godfather_asistente.jpg',
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Icon(Icons.person, color: GodfatherTheme.primaryGold, size: 30);
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            )
+                          : Image.asset(
+                              'assets/images/godfather_asistente.png',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/godfather_asistente.jpg',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(Icons.person, color: GodfatherTheme.primaryGold, size: 30);
+                                  },
+                                );
+                              },
+                            ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -2079,6 +2116,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   ),
                   onPressed: () async {
                     Navigator.pop(context);
+                    
+                    // Limpiar explícitamente el estado de la familia seleccionada al cerrar sesión
+                    ref.read(selectedFamilyProvider.notifier).update((_) => null);
+                    
                     final client = ref.read(supabaseClientProvider);
                     await client.auth.signOut();
                     

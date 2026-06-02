@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:remixicon/remixicon.dart';
 import '../../../core/theme.dart';
 import '../../../core/supabase_service.dart';
 import '../../../core/storage_helper.dart';
@@ -170,6 +171,49 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Error inesperado al iniciar sesión.'),
+            backgroundColor: GodfatherTheme.alertRed,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loginWithGoogle() async {
+    setState(() => _isLoading = true);
+    try {
+      final client = ref.read(supabaseClientProvider);
+      
+      // Iniciar flujo OAuth de Google nativo de Supabase
+      await client.auth.signInWithOAuth(
+        OAuthProvider.google,
+      );
+      
+    } on AuthException catch (e) {
+      if (mounted) {
+        String errorMessage = 'Ocurrió un problema al iniciar sesión. Intenta nuevamente.';
+        final msg = e.message.toLowerCase();
+        if (msg.contains('cancelled') || msg.contains('canceled') || msg.contains('cancelado') || msg.contains('user_cancelled')) {
+          errorMessage = 'Inicio con Google cancelado.';
+        } else if (msg.contains('network') || msg.contains('connection') || msg.contains('conexión') || msg.contains('internet')) {
+          errorMessage = 'No se pudo conectar con Google. Revisa tu internet e intenta nuevamente.';
+        } else if (msg.contains('block') || msg.contains('disable') || msg.contains('bloqueada') || msg.contains('suspended')) {
+          errorMessage = 'Esta cuenta no está disponible. Contacta al administrador.';
+        }
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: GodfatherTheme.alertRed,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Ocurrió un problema al iniciar sesión. Intenta nuevamente.'),
             backgroundColor: GodfatherTheme.alertRed,
           ),
         );
@@ -368,6 +412,66 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                     ),
                   ),
                   const SizedBox(height: 32),
+                  
+                  // Botón "Continuar con Google" (Alto contraste, grande y accesible para adultos mayores)
+                  ElevatedButton.icon(
+                    key: const Key('google_signin_button'),
+                    onPressed: _isLoading ? null : _loginWithGoogle,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: GodfatherTheme.primaryGold,
+                      foregroundColor: GodfatherTheme.backgroundBlack,
+                      minimumSize: const Size(double.infinity, 56),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 4,
+                    ),
+                    icon: Icon(
+                      RemixIcons.google_fill,
+                      color: GodfatherTheme.backgroundBlack,
+                      size: 26,
+                    ),
+                    label: Text(
+                      'Continuar con Google'.toUpperCase(),
+                      style: GoogleFonts.cinzel(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Texto divisorio decorativo en oro
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          color: GodfatherTheme.borderColor,
+                          thickness: 1.5,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          'También puedes ingresar con correo y contraseña',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            color: GodfatherTheme.textLight.withValues(alpha: 0.5),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                          color: GodfatherTheme.borderColor,
+                          thickness: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
                   
                   // Campo de Email
                   TextFormField(
