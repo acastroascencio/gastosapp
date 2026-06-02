@@ -864,6 +864,23 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
                         duration: const Duration(milliseconds: 250),
                         switchInCurve: Curves.easeOutCubic,
                         switchOutCurve: Curves.easeInCubic,
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: AnimatedBuilder(
+                              animation: animation,
+                              builder: (context, child) {
+                                final isOutgoing = animation.status == AnimationStatus.reverse ||
+                                                   animation.status == AnimationStatus.dismissed;
+                                return IgnorePointer(
+                                  ignoring: isOutgoing,
+                                  child: child,
+                                );
+                              },
+                              child: child,
+                            ),
+                          );
+                        },
                         child: KeyedSubtree(
                           key: ValueKey<String>('${_type.toString()}_${_target.toString()}'),
                           child: _buildCategorySelector(

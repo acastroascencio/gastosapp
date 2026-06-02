@@ -493,6 +493,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       duration: const Duration(milliseconds: 250),
                       switchInCurve: Curves.easeOutCubic,
                       switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: AnimatedBuilder(
+                            animation: animation,
+                            builder: (context, child) {
+                              final isOutgoing = animation.status == AnimationStatus.reverse ||
+                                                 animation.status == AnimationStatus.dismissed;
+                              return IgnorePointer(
+                                ignoring: isOutgoing,
+                                child: child,
+                              );
+                            },
+                            child: child,
+                          ),
+                        );
+                      },
                       child: KeyedSubtree(
                         key: ValueKey<int>(_currentTabIndex),
                         child: _buildTabContent(
@@ -1182,6 +1199,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           duration: const Duration(milliseconds: 250),
           switchInCurve: Curves.easeOutCubic,
           switchOutCurve: Curves.easeInCubic,
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: AnimatedBuilder(
+                animation: animation,
+                builder: (context, child) {
+                  final isOutgoing = animation.status == AnimationStatus.reverse ||
+                                     animation.status == AnimationStatus.dismissed;
+                  return IgnorePointer(
+                    ignoring: isOutgoing,
+                    child: child,
+                  );
+                },
+                child: child,
+              ),
+            );
+          },
           child: personalTxs.isEmpty
               ? Padding(
                   key: ValueKey<String>('empty_personal_hist_${_selectedDate.month}'),
@@ -1578,6 +1612,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               duration: const Duration(milliseconds: 250),
               switchInCurve: Curves.easeOutCubic,
               switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (child, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: AnimatedBuilder(
+                    animation: animation,
+                    builder: (context, child) {
+                      final isOutgoing = animation.status == AnimationStatus.reverse ||
+                                         animation.status == AnimationStatus.dismissed;
+                      return IgnorePointer(
+                        ignoring: isOutgoing,
+                        child: child,
+                      );
+                    },
+                    child: child,
+                  ),
+                );
+              },
               child: houseTxs.isEmpty
                   ? Padding(
                       key: ValueKey<String>('empty_house_hist_${_selectedDate.month}'),
