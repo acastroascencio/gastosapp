@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' hide Family;
@@ -253,7 +255,7 @@ class _FamilySettingsSheetState extends ConsumerState<FamilySettingsSheet> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          '• ${member.fullName ?? "Miembro"} (${member.role == "admin" ? "Administrador" : "Miembro"})' + (isMe ? ' (Tú)' : ''),
+                                          '• ${member.fullName ?? "Miembro"} (${member.role == "admin" ? "Administrador" : "Miembro"})${isMe ? ' (Tú)' : ''}',
                                           style: TextStyle(
                                             color: GodfatherTheme.textLight,
                                             fontSize: 16,
@@ -634,14 +636,14 @@ class _FamilySettingsSheetState extends ConsumerState<FamilySettingsSheet> {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          Text('• $memberCount miembros actuales', style: const TextStyle(fontSize: 15, color: Colors.white)),
-                          Text('• $expensesCount gastos registrados', style: const TextStyle(fontSize: 15, color: Colors.white)),
-                          Text('• $abonosCount abonos registrados', style: const TextStyle(fontSize: 15, color: Colors.white)),
+                          Text('• $memberCount miembros actuales', style: TextStyle(fontSize: 15, color: GodfatherTheme.textLight)),
+                          Text('• $expensesCount gastos registrados', style: TextStyle(fontSize: 15, color: GodfatherTheme.textLight)),
+                          Text('• $abonosCount abonos registrados', style: TextStyle(fontSize: 15, color: GodfatherTheme.textLight)),
                           const SizedBox(height: 8),
-                          const Text(
+                          Text(
                             'Estos datos quedarán archivados y la familia dejará de estar activa.',
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: GodfatherTheme.textLight.withOpacity(0.8),
                               fontStyle: FontStyle.italic,
                               fontSize: 14,
                             ),
@@ -750,30 +752,82 @@ class _FamilySettingsSheetState extends ConsumerState<FamilySettingsSheet> {
   void _kickMember(String familyId, String userId, String userName) {
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.55),
       builder: (ctx) => AlertDialog(
         backgroundColor: GodfatherTheme.surfaceDark,
-        title: Text('Expulsar Miembro', style: TextStyle(color: GodfatherTheme.alertRed)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: GodfatherTheme.alertRed, width: 2),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: GodfatherTheme.alertRed, size: 28),
+            const SizedBox(width: 10),
+            Text(
+              'EXPULSAR MIEMBRO',
+              style: GoogleFonts.cinzel(
+                color: GodfatherTheme.alertRed,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
         content: Text(
           '¿Estás seguro de que deseas expulsar a $userName de la familia?',
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(
+            color: GodfatherTheme.textLight,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('CANCELAR', style: TextStyle(color: GodfatherTheme.primaryGold)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: GodfatherTheme.alertRed),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              try {
-                await ref.read(familyProvider.notifier).removeMember(familyId, userId);
-                _showSnackBar('Miembro expulsado.', GodfatherTheme.successGreen);
-              } catch (e) {
-                _showSnackBar('Error al expulsar: $e', GodfatherTheme.alertRed);
-              }
-            },
-            child: const Text('SÍ, EXPULSAR', style: TextStyle(color: Colors.white)),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, 56),
+                    side: BorderSide(color: GodfatherTheme.textMuted, width: 1.5),
+                  ),
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text(
+                    'CANCELAR',
+                    style: TextStyle(
+                      color: GodfatherTheme.textLight,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: GodfatherTheme.alertRed,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 56),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(ctx);
+                    try {
+                      await ref.read(familyProvider.notifier).removeMember(familyId, userId);
+                      _showSnackBar('Miembro expulsado.', GodfatherTheme.successGreen);
+                    } catch (e) {
+                      _showSnackBar('Error al expulsar: $e', GodfatherTheme.alertRed);
+                    }
+                  },
+                  child: const Text(
+                    'EXPULSAR',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

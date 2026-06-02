@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,7 +32,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   
   // Animaciones para las transiciones
   late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
 
   // Timer para la hora en tiempo real del header
   late Timer _timer;
@@ -67,9 +68,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
       duration: const Duration(milliseconds: 400),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
-    );
+
     _fadeController.forward();
   }
 
@@ -113,51 +112,99 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   void _deleteTransaction(Transaction tx) {
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.55),
       builder: (ctx) => AlertDialog(
         backgroundColor: GodfatherTheme.surfaceDark,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(color: GodfatherTheme.primaryGold, width: 2),
         ),
-        title: Text('Eliminar Movimiento', style: TextStyle(color: GodfatherTheme.alertRed, fontWeight: FontWeight.bold)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: GodfatherTheme.alertRed, size: 28),
+            const SizedBox(width: 10),
+            Text(
+              'ELIMINAR MOVIMIENTO',
+              style: GoogleFonts.cinzel(
+                color: GodfatherTheme.alertRed,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
         content: Text(
           '¿Estás seguro de que deseas eliminar este movimiento: "${tx.concept}"?',
-          style: const TextStyle(color: Colors.white, fontSize: 18),
+          style: TextStyle(
+            color: GodfatherTheme.textLight,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('CANCELAR', style: TextStyle(color: GodfatherTheme.primaryGold, fontSize: 16, fontWeight: FontWeight.bold)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: GodfatherTheme.alertRed,
-              minimumSize: const Size(100, 48),
-            ),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              try {
-                await ref.read(transactionProvider.notifier).softDeleteTransaction(tx.id, tx.familyId);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Movimiento eliminado con éxito.', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      backgroundColor: GodfatherTheme.successGreen,
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, 56),
+                    side: BorderSide(color: GodfatherTheme.textMuted, width: 1.5),
+                  ),
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text(
+                    'CANCELAR',
+                    style: TextStyle(
+                      color: GodfatherTheme.textLight,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error al eliminar: $e'),
-                      backgroundColor: GodfatherTheme.alertRed,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: GodfatherTheme.alertRed,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 56),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(ctx);
+                    try {
+                      await ref.read(transactionProvider.notifier).softDeleteTransaction(tx.id, tx.familyId);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text(
+                              'Movimiento eliminado con éxito.',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            backgroundColor: GodfatherTheme.successGreen,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error al eliminar: $e'),
+                            backgroundColor: GodfatherTheme.alertRed,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  child: const Text(
+                    'ELIMINAR',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
-                  );
-                }
-              }
-            },
-            child: const Text('ELIMINAR', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -295,14 +342,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 controller: TextEditingController(text: currentEmail),
                 enabled: false,
                 style: TextStyle(
-                  color: GodfatherTheme.isDarkMode ? Colors.white60 : Colors.black54,
+                  color: GodfatherTheme.isDarkMode ? const Color(0xFFD0D0D0) : const Color(0xFF4A4A4A),
                   fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
                 decoration: InputDecoration(
                   hintText: 'invitado@corleone.com',
                   prefixIcon: Icon(Icons.mail_outline, color: GodfatherTheme.primaryGold),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                  fillColor: GodfatherTheme.isDarkMode ? Colors.black38 : Colors.grey.shade300,
+                  fillColor: GodfatherTheme.isDarkMode ? Colors.black38 : const Color(0xFFEFECE6),
                   filled: true,
                 ),
               ),
@@ -406,51 +454,55 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         orElse: () => null,
       ),
       backgroundColor: GodfatherTheme.backgroundBlack,
-      body: SafeArea(
-        child: transactionsAsync.when(
-          loading: () => Center(
-            child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(GodfatherTheme.primaryGold)),
-          ),
-          error: (err, stack) => Center(
-            child: Text(
-              'Error al cargar datos: $err',
-              style: TextStyle(color: GodfatherTheme.alertRed),
+      body: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        color: GodfatherTheme.backgroundBlack,
+        child: SafeArea(
+          child: transactionsAsync.when(
+            loading: () => Center(
+              child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(GodfatherTheme.primaryGold)),
             ),
-          ),
-          data: (transactions) {
-            final budgetLimit = budgetAsync.value?.limitAmount ?? 200.0;
+            error: (err, stack) => Center(
+              child: Text(
+                'Error al cargar datos: $err',
+                style: TextStyle(color: GodfatherTheme.alertRed),
+              ),
+            ),
+            data: (transactions) {
+              final budgetLimit = budgetAsync.value?.limitAmount ?? 200.0;
 
-            // Filtrar transacciones del mes seleccionado
-            final currentMonthTransactions = transactions.where((tx) {
-              return tx.createdAt.month == _selectedDate.month && tx.createdAt.year == _selectedDate.year;
-            }).toList();
+              // Filtrar transacciones del mes seleccionado
+              final currentMonthTransactions = transactions.where((tx) {
+                return tx.createdAt.month == _selectedDate.month && tx.createdAt.year == _selectedDate.year;
+              }).toList();
 
-            // Cálculos del mes seleccionado (usando valores absolutos)
-            final personalExpenses = currentMonthTransactions
-                .where((tx) => tx.targetModule == TargetModule.personal && tx.transactionType == TransactionType.gasto)
-                .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+              // Cálculos del mes seleccionado (usando valores absolutos)
+              final personalExpenses = currentMonthTransactions
+                  .where((tx) => tx.targetModule == TargetModule.personal && tx.transactionType == TransactionType.gasto)
+                  .fold(0.0, (sum, tx) => sum + tx.amount.abs());
 
-            return Column(
-              children: [
-                // 1. HEADER (MOCKUP IDÉNTICO)
-                _buildHeader(budgetLimit, personalExpenses),
+              return Column(
+                children: [
+                  // 1. HEADER (MOCKUP IDÉNTICO)
+                  _buildHeader(budgetLimit, personalExpenses),
 
-                // 2. CONTENIDO PRINCIPAL (SWAP DE TABS)
-                Expanded(
-                  child: AnimatedBuilder(
-                    animation: _fadeAnimation,
-                    builder: (context, child) {
-                      return Opacity(
-                        opacity: _fadeAnimation.value,
+                  // 2. CONTENIDO PRINCIPAL (SWAP DE TABS)
+                  Expanded(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      child: KeyedSubtree(
+                        key: ValueKey<int>(_currentTabIndex),
                         child: _buildTabContent(
                           tabIndex: _currentTabIndex,
                           transactions: transactions,
                           budgetLimit: budgetLimit,
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
-                ),
 
                 // 3. BARRA DE NAVEGACIÓN INFERIOR PREMIUM NOIR
                 _buildBottomNavigationBar(),
@@ -459,7 +511,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           },
         ),
       ),
-    );
+    ),
+  );
   }
 
   // HEADER DE DISEÑO IDÉNTICO AL MOCKUP
@@ -1125,125 +1178,131 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           style: GoogleFonts.cinzel(color: GodfatherTheme.primaryGold, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 18),
         ),
         const SizedBox(height: 12),
-        if (personalTxs.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 36.0),
-            child: Text(
-              'Sin movimientos registrados en tu caja chica.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: GodfatherTheme.textMuted, fontStyle: FontStyle.italic, fontSize: 18),
-            ),
-          )
-        else
-          ListView.separated(
-            shrinkWrap: true,
-            physics: isWide ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
-            itemCount: personalTxs.length,
-            separatorBuilder: (context, index) => Divider(color: GodfatherTheme.borderColor),
-            itemBuilder: (context, index) {
-              final tx = personalTxs[index];
-              final isExpense = tx.transactionType == TransactionType.gasto;
-              final visuals = GodfatherTheme.getCategoryVisuals(tx.category);
-              return Container(
-                padding: const EdgeInsets.symmetric(vertical: 14.0),
-                constraints: const BoxConstraints(minHeight: 72),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: visuals.bgColor,
-                        border: Border.all(
-                          color: visuals.color.withValues(alpha: 0.45),
-                          width: 1.5,
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        visuals.icon,
-                        color: visuals.color,
-                        size: 26,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          child: personalTxs.isEmpty
+              ? Padding(
+                  key: ValueKey<String>('empty_personal_hist_${_selectedDate.month}'),
+                  padding: const EdgeInsets.symmetric(vertical: 36.0),
+                  child: Text(
+                    'Sin movimientos registrados en tu caja chica.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: GodfatherTheme.textMuted, fontStyle: FontStyle.italic, fontSize: 18),
+                  ),
+                )
+              : ListView.separated(
+                  key: ValueKey<String>('list_personal_hist_${_selectedDate.month}_${personalTxs.length}'),
+                  shrinkWrap: true,
+                  physics: isWide ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+                  itemCount: personalTxs.length,
+                  separatorBuilder: (context, index) => Divider(color: GodfatherTheme.borderColor),
+                  itemBuilder: (context, index) {
+                    final tx = personalTxs[index];
+                    final isExpense = tx.transactionType == TransactionType.gasto;
+                    final visuals = GodfatherTheme.getCategoryVisuals(tx.category);
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      constraints: const BoxConstraints(minHeight: 72),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            tx.concept,
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 19,
-                              color: GodfatherTheme.textLight,
-                              height: 1.2,
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: visuals.bgColor,
+                              border: Border.all(
+                                color: visuals.color.withValues(alpha: 0.45),
+                                width: 1.5,
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              visuals.icon,
+                              color: visuals.color,
+                              size: 26,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            tx.category,
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: GodfatherTheme.textLight.withValues(alpha: 0.8),
-                              height: 1.2,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  tx.concept,
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 19,
+                                    color: GodfatherTheme.textLight,
+                                    height: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  tx.category,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: GodfatherTheme.textLight.withValues(alpha: 0.8),
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
                             ),
+                          ),
+                          const SizedBox(width: 12),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.3),
+                                    width: 1.0,
+                                  ),
+                                ),
+                                child: Text(
+                                  '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 20,
+                                    color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              IconButton(
+                                icon: const Icon(RemixIcons.pencil_fill, size: 24),
+                                color: GodfatherTheme.primaryGold,
+                                onPressed: () => _openEditTransaction(tx),
+                                constraints: const BoxConstraints(),
+                                padding: EdgeInsets.zero,
+                              ),
+                              const SizedBox(width: 12),
+                              IconButton(
+                                icon: const Icon(RemixIcons.delete_bin_fill, size: 24),
+                                color: GodfatherTheme.alertRed,
+                                onPressed: () => _deleteTransaction(tx),
+                                constraints: const BoxConstraints(),
+                                padding: EdgeInsets.zero,
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.3),
-                              width: 1.0,
-                            ),
-                          ),
-                          child: Text(
-                            '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 20,
-                              color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        IconButton(
-                          icon: const Icon(RemixIcons.pencil_fill, size: 24),
-                          color: GodfatherTheme.primaryGold,
-                          onPressed: () => _openEditTransaction(tx),
-                          constraints: const BoxConstraints(),
-                          padding: EdgeInsets.zero,
-                        ),
-                        const SizedBox(width: 12),
-                        IconButton(
-                          icon: const Icon(RemixIcons.delete_bin_fill, size: 24),
-                          color: GodfatherTheme.alertRed,
-                          onPressed: () => _deleteTransaction(tx),
-                          constraints: const BoxConstraints(),
-                          padding: EdgeInsets.zero,
-                        ),
-                      ],
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              );
-            },
-          ),
+        ),
       ],
     );
 
@@ -1515,125 +1574,131 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               style: GoogleFonts.cinzel(color: GodfatherTheme.primaryGold, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 18),
             ),
             const SizedBox(height: 12),
-            if (houseTxs.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 36.0),
-                child: Text(
-                  'Sin movimientos registrados en los gastos compartidos.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: GodfatherTheme.textMuted, fontStyle: FontStyle.italic, fontSize: 18),
-                ),
-              )
-            else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: isWide ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
-                itemCount: houseTxs.length,
-                separatorBuilder: (context, index) => Divider(color: GodfatherTheme.borderColor),
-                itemBuilder: (context, index) {
-                  final tx = houseTxs[index];
-                  final isExpense = tx.transactionType == TransactionType.gasto;
-                  final visuals = GodfatherTheme.getCategoryVisuals(tx.category);
-                  return Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    constraints: const BoxConstraints(minHeight: 72),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: visuals.bgColor,
-                            border: Border.all(
-                              color: visuals.color.withValues(alpha: 0.45),
-                              width: 1.5,
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Icon(
-                            visuals.icon,
-                            color: visuals.color,
-                            size: 26,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              child: houseTxs.isEmpty
+                  ? Padding(
+                      key: ValueKey<String>('empty_house_hist_${_selectedDate.month}'),
+                      padding: const EdgeInsets.symmetric(vertical: 36.0),
+                      child: Text(
+                        'Sin movimientos registrados en los gastos compartidos.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: GodfatherTheme.textMuted, fontStyle: FontStyle.italic, fontSize: 18),
+                      ),
+                    )
+                  : ListView.separated(
+                      key: ValueKey<String>('list_house_hist_${_selectedDate.month}_${houseTxs.length}'),
+                      shrinkWrap: true,
+                      physics: isWide ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+                      itemCount: houseTxs.length,
+                      separatorBuilder: (context, index) => Divider(color: GodfatherTheme.borderColor),
+                      itemBuilder: (context, index) {
+                        final tx = houseTxs[index];
+                        final isExpense = tx.transactionType == TransactionType.gasto;
+                        final visuals = GodfatherTheme.getCategoryVisuals(tx.category);
+                        return Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14.0),
+                          constraints: const BoxConstraints(minHeight: 72),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                tx.concept,
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 19,
-                                  color: GodfatherTheme.textLight,
-                                  height: 1.2,
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: visuals.bgColor,
+                                  border: Border.all(
+                                    color: visuals.color.withValues(alpha: 0.45),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  visuals.icon,
+                                  color: visuals.color,
+                                  size: 26,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${tx.category} • Por: ${tx.createdByName ?? "Miembro"}',
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: GodfatherTheme.textLight.withValues(alpha: 0.8),
-                                  height: 1.2,
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      tx.concept,
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 19,
+                                        color: GodfatherTheme.textLight,
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${tx.category} • Por: ${tx.createdByName ?? "Miembro"}',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: GodfatherTheme.textLight.withValues(alpha: 0.8),
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                              ),
+                              const SizedBox(width: 12),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.3),
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 20,
+                                        color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  IconButton(
+                                    icon: const Icon(RemixIcons.pencil_fill, size: 24),
+                                    color: GodfatherTheme.primaryGold,
+                                    onPressed: () => _openEditTransaction(tx),
+                                    constraints: const BoxConstraints(),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  IconButton(
+                                    icon: const Icon(RemixIcons.delete_bin_fill, size: 24),
+                                    color: GodfatherTheme.alertRed,
+                                    onPressed: () => _deleteTransaction(tx),
+                                    constraints: const BoxConstraints(),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.3),
-                                  width: 1.0,
-                                ),
-                              ),
-                              child: Text(
-                                '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 20,
-                                  color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            IconButton(
-                              icon: const Icon(RemixIcons.pencil_fill, size: 24),
-                              color: GodfatherTheme.primaryGold,
-                              onPressed: () => _openEditTransaction(tx),
-                              constraints: const BoxConstraints(),
-                              padding: EdgeInsets.zero,
-                            ),
-                            const SizedBox(width: 12),
-                            IconButton(
-                              icon: const Icon(RemixIcons.delete_bin_fill, size: 24),
-                              color: GodfatherTheme.alertRed,
-                              onPressed: () => _deleteTransaction(tx),
-                              constraints: const BoxConstraints(),
-                              padding: EdgeInsets.zero,
-                            ),
-                          ],
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
+            ),
           ],
         );
 

@@ -650,7 +650,7 @@ final selectedFamilyProvider = StateProvider<Family?>((ref) {
   final familiesAsync = ref.watch(familyProvider);
   return familiesAsync.when(
     data: (list) => list.isNotEmpty ? list.first : null,
-    error: (_, __) => null,
+    error: (err, stack) => null,
     loading: () => null,
   );
 });

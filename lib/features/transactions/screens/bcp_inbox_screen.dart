@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' hide Family;
 import 'package:google_fonts/google_fonts.dart';
@@ -422,6 +424,7 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
 
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.55),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
@@ -433,44 +436,96 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
               ),
               title: Text(
                 'EDITAR Y REGISTRAR',
-                style: GoogleFonts.cinzel(color: GodfatherTheme.primaryGold, fontWeight: FontWeight.bold),
+                style: GoogleFonts.cinzel(
+                  color: GodfatherTheme.primaryGold,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Concepto
-                    TextFormField(
-                      controller: conceptController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        labelText: 'Concepto',
+                    Text(
+                      'Edita los datos del movimiento detectado antes de guardarlo en tu cuenta.',
+                      style: TextStyle(
+                        color: GodfatherTheme.isDarkMode ? const Color(0xFFD0D0D0) : const Color(0xFF4A4A4A),
+                        fontSize: 15,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
+
+                    // Concepto
+                    Text(
+                      'Concepto',
+                      style: TextStyle(
+                        color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: conceptController,
+                      style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                      decoration: InputDecoration(
+                        hintText: 'Concepto de la transacción',
+                        hintStyle: TextStyle(color: GodfatherTheme.textMuted.withOpacity(0.5), fontSize: 16),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
 
                     // Monto
+                    Text(
+                      'Monto (S/.)',
+                      style: TextStyle(
+                        color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     TextFormField(
                       controller: amountController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        labelText: 'Monto (S/.)',
+                      style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                      decoration: InputDecoration(
+                        hintText: '0.00',
+                        hintStyle: TextStyle(color: GodfatherTheme.textMuted.withOpacity(0.5), fontSize: 16),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
 
                     // Categoría
+                    Text(
+                      'Categoría',
+                      style: TextStyle(
+                        color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       dropdownColor: GodfatherTheme.surfaceDark,
                       value: categories.contains(selectedCategory) ? selectedCategory : 'Otros',
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                      decoration: const InputDecoration(labelText: 'Categoría'),
+                      style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      ),
                       items: categories.map((cat) {
                         return DropdownMenuItem<String>(
                           value: cat,
-                          child: Text(cat),
+                          child: Text(
+                            cat,
+                            style: TextStyle(
+                              color: GodfatherTheme.textLight,
+                              fontSize: 18,
+                            ),
+                          ),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -479,18 +534,41 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
                         }
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
 
                     // Destino (Personal / Familia)
+                    Text(
+                      'Destino / Cuenta',
+                      style: TextStyle(
+                        color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       dropdownColor: GodfatherTheme.surfaceDark,
                       value: selectedScope,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                      decoration: const InputDecoration(labelText: 'Destino / Cuenta'),
+                      style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      ),
                       items: [
-                        const DropdownMenuItem(value: 'personal', child: Text('Personal')),
+                        DropdownMenuItem(
+                          value: 'personal',
+                          child: Text(
+                            'Personal',
+                            style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                          ),
+                        ),
                         if (families.isNotEmpty)
-                          const DropdownMenuItem(value: 'family', child: Text('Familia Compartida')),
+                          DropdownMenuItem(
+                            value: 'family',
+                            child: Text(
+                              'Familia Compartida',
+                              style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                            ),
+                          ),
                       ],
                       onChanged: (val) {
                         if (val != null) {
@@ -498,17 +576,34 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
                         }
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
 
                     // Selección de Familia si destino es Familia
-                    if (selectedScope == 'family' && families.isNotEmpty)
+                    if (selectedScope == 'family' && families.isNotEmpty) ...[
+                      Text(
+                        'Familia Específica',
+                        style: TextStyle(
+                          color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
                         dropdownColor: GodfatherTheme.surfaceDark,
                         value: selectedFamilyId,
-                        style: const TextStyle(color: Colors.white, fontSize: 16),
-                        decoration: const InputDecoration(labelText: 'Familia Específica'),
+                        style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                        ),
                         items: families.map((fam) {
-                          return DropdownMenuItem(value: fam.id, child: Text(fam.name));
+                          return DropdownMenuItem(
+                            value: fam.id,
+                            child: Text(
+                              fam.name,
+                              style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                            ),
+                          );
                         }).toList(),
                         onChanged: (val) {
                           if (val != null) {
@@ -516,38 +611,69 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
                           }
                         },
                       ),
+                    ],
                   ],
                 ),
               ),
               actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text('CANCELAR', style: TextStyle(color: GodfatherTheme.primaryGold, fontSize: 16)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: GodfatherTheme.successGreen),
-                  onPressed: () async {
-                    final double? amount = double.tryParse(amountController.text);
-                    if (amount == null || amount <= 0) {
-                      _showSnackBar('Ingresa un monto válido', GodfatherTheme.alertRed);
-                      return;
-                    }
-                    Navigator.pop(ctx);
-                    try {
-                      await ref.read(emailSyncProvider.notifier).approveMovement(
-                            movement: movement,
-                            scope: selectedScope,
-                            familyId: selectedScope == 'family' ? selectedFamilyId : null,
-                            amount: amount,
-                            concept: conceptController.text.trim(),
-                            category: selectedCategory,
-                          );
-                      _showSnackBar('Movimiento registrado con éxito.', GodfatherTheme.successGreen);
-                    } catch (e) {
-                      _showSnackBar('Error al registrar: $e', GodfatherTheme.alertRed);
-                    }
-                  },
-                  child: const Text('REGISTRAR', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(0, 56),
+                          side: BorderSide(color: GodfatherTheme.textMuted, width: 1.5),
+                        ),
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text(
+                          'CANCELAR',
+                          style: TextStyle(
+                            color: GodfatherTheme.textLight,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: GodfatherTheme.successGreen,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(0, 56),
+                        ),
+                        onPressed: () async {
+                          final double? amount = double.tryParse(amountController.text);
+                          if (amount == null || amount <= 0) {
+                            _showSnackBar('Ingresa un monto válido', GodfatherTheme.alertRed);
+                            return;
+                          }
+                          Navigator.pop(ctx);
+                          try {
+                            await ref.read(emailSyncProvider.notifier).approveMovement(
+                                  movement: movement,
+                                  scope: selectedScope,
+                                  familyId: selectedScope == 'family' ? selectedFamilyId : null,
+                                  amount: amount,
+                                  concept: conceptController.text.trim(),
+                                  category: selectedCategory,
+                                );
+                            _showSnackBar('Movimiento registrado con éxito.', GodfatherTheme.successGreen);
+                          } catch (e) {
+                            _showSnackBar('Error al registrar: $e', GodfatherTheme.alertRed);
+                          }
+                        },
+                        child: const Text(
+                          'REGISTRAR',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );

@@ -195,7 +195,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                   );
                 },
                 loading: () => const SizedBox(height: 52),
-                error: (_, __) => const SizedBox(height: 52),
+                error: (err, stack) => const SizedBox(height: 52),
               ),
 
             Expanded(
@@ -235,8 +235,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                     }
                   }
 
+                  final Widget bodyWidget;
+
                   if (moduleTransactions.isEmpty) {
-                    return Center(
+                    bodyWidget = Center(
+                      key: ValueKey<String>('empty_${_selectedDate.month}-$_selectedModule'),
                       child: SingleChildScrollView(
                         child: Padding(
                           padding: const EdgeInsets.all(28.0),
@@ -259,394 +262,403 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                         ),
                       ),
                     );
-                  }
+                  } else {
+                    // 3. Cálculos de estadísticas rápidas
+                    final totalIncome = moduleTransactions
+                        .where((tx) => tx.transactionType == TransactionType.abono)
+                        .fold(0.0, (sum, tx) => sum + tx.amount);
 
-                  // 3. Cálculos de estadísticas rápidas
-                  final totalIncome = moduleTransactions
-                      .where((tx) => tx.transactionType == TransactionType.abono)
-                      .fold(0.0, (sum, tx) => sum + tx.amount);
+                    final totalExpenses = moduleTransactions
+                        .where((tx) => tx.transactionType == TransactionType.gasto)
+                        .fold(0.0, (sum, tx) => sum + tx.amount);
 
-                  final totalExpenses = moduleTransactions
-                      .where((tx) => tx.transactionType == TransactionType.gasto)
-                      .fold(0.0, (sum, tx) => sum + tx.amount);
+                    final balance = _selectedModule == TargetModule.casa
+                        ? (totalIncome - totalExpenses)
+                        : -totalExpenses;
 
-                  final balance = _selectedModule == TargetModule.casa
-                      ? (totalIncome - totalExpenses)
-                      : -totalExpenses;
-
-                  // 4. Agrupar gastos por categoría para el gráfico
-                  final expensesByCategory = <String, double>{};
-                  for (final tx in moduleTransactions) {
-                    if (tx.transactionType == TransactionType.gasto) {
-                      expensesByCategory[tx.category] =
-                          (expensesByCategory[tx.category] ?? 0.0) + tx.amount;
-                    }
-                  }
-
-                  // 5. Resumen de registros por usuario (para reporte familiar)
-                  final userContributions = <String, double>{};
-                  if (_selectedModule == TargetModule.casa) {
+                    // 4. Agrupar gastos por categoría para el gráfico
+                    final expensesByCategory = <String, double>{};
                     for (final tx in moduleTransactions) {
                       if (tx.transactionType == TransactionType.gasto) {
-                        final userName = tx.createdByName ?? 'Miembro';
-                        userContributions[userName] = (userContributions[userName] ?? 0.0) + tx.amount;
+                        expensesByCategory[tx.category] =
+                            (expensesByCategory[tx.category] ?? 0.0) + tx.amount;
                       }
                     }
-                  }
 
-                  // 6. Preparar secciones del gráfico circular
-                  final List<PieChartSectionData> chartSections = [];
-                  final colors = [
-                    GodfatherTheme.primaryGold,
-                    GodfatherTheme.secondaryGold,
-                    const Color(0xFFC1121F), // Rojo Padrino
-                    const Color(0xFF15803D), // Verde Padrino
-                    const Color(0xFF00796B),
-                    const Color(0xFF303F9F),
-                    const Color(0xFF5D4037),
-                  ];
+                    // 5. Resumen de registros por usuario (para reporte familiar)
+                    final userContributions = <String, double>{};
+                    if (_selectedModule == TargetModule.casa) {
+                      for (final tx in moduleTransactions) {
+                        if (tx.transactionType == TransactionType.gasto) {
+                          final userName = tx.createdByName ?? 'Miembro';
+                          userContributions[userName] = (userContributions[userName] ?? 0.0) + tx.amount;
+                        }
+                      }
+                    }
 
-                  int colorIndex = 0;
-                  expensesByCategory.forEach((category, amount) {
-                    final percentage = totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0.0;
-                    chartSections.add(
-                      PieChartSectionData(
-                        color: colors[colorIndex % colors.length],
-                        value: amount,
-                        title: '${percentage.toStringAsFixed(0)}%',
-                        radius: 50,
-                        titleStyle: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                    // 6. Preparar secciones del gráfico circular
+                    final List<PieChartSectionData> chartSections = [];
+                    final colors = [
+                      GodfatherTheme.primaryGold,
+                      GodfatherTheme.secondaryGold,
+                      const Color(0xFFC1121F), // Rojo Padrino
+                      const Color(0xFF15803D), // Verde Padrino
+                      const Color(0xFF00796B),
+                      const Color(0xFF303F9F),
+                      const Color(0xFF5D4037),
+                    ];
+
+                    int colorIndex = 0;
+                    expensesByCategory.forEach((category, amount) {
+                      final percentage = totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0.0;
+                      chartSections.add(
+                        PieChartSectionData(
+                          color: colors[colorIndex % colors.length],
+                          value: amount,
+                          title: '${percentage.toStringAsFixed(0)}%',
+                          radius: 50,
+                          titleStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                    );
-                    colorIndex++;
-                  });
+                      );
+                      colorIndex++;
+                    });
 
-                  final isWide = MediaQuery.of(context).size.width > 900;
+                    final isWide = MediaQuery.of(context).size.width > 900;
 
-                  Widget leftColumnContent = Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Gráfico de anillos
-                      if (totalExpenses > 0)
-                        Container(
-                          height: 200,
-                          margin: const EdgeInsets.symmetric(vertical: 12),
-                          child: PieChart(
-                            PieChartData(
-                              sectionsSpace: 3,
-                              centerSpaceRadius: 40,
-                              sections: chartSections,
+                    Widget leftColumnContent = Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Gráfico de anillos
+                        if (totalExpenses > 0)
+                          Container(
+                            height: 200,
+                            margin: const EdgeInsets.symmetric(vertical: 12),
+                            child: PieChart(
+                              PieChartData(
+                                sectionsSpace: 3,
+                                centerSpaceRadius: 40,
+                                sections: chartSections,
+                              ),
+                            ),
+                          )
+                        else
+                          Container(
+                            height: 140,
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Sin egresos registrados en este periodo.',
+                              style: TextStyle(
+                                color: GodfatherTheme.textLight.withValues(alpha: 0.7),
+                                fontStyle: FontStyle.italic,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
-                        )
-                      else
-                        Container(
-                          height: 140,
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Sin egresos registrados en este periodo.',
-                            style: TextStyle(
-                              color: GodfatherTheme.textLight.withValues(alpha: 0.7),
-                              fontStyle: FontStyle.italic,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
 
-                      // Leyenda de categorías del gráfico
-                      if (totalExpenses > 0)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: Wrap(
-                            spacing: 12,
-                            runSpacing: 8,
-                            alignment: WrapAlignment.center,
-                            children: List.generate(expensesByCategory.length, (index) {
-                              final entry = expensesByCategory.entries.elementAt(index);
-                              return Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 12,
-                                    height: 12,
-                                    decoration: BoxDecoration(
-                                      color: colors[index % colors.length],
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '${entry.key}: S/. ${entry.value.toStringAsFixed(0)}',
-                                    style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight),
-                                  ),
-                                ],
-                              );
-                            }),
-                          ),
-                        ),
-
-                      // Resumen numérico premium
-                      Card(
-                        elevation: 2,
-                        color: GodfatherTheme.surfaceDark,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(color: GodfatherTheme.borderColor),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(18.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              if (_selectedModule == TargetModule.casa) ...[
-                                Column(
+                        // Leyenda de categorías del gráfico
+                        if (totalExpenses > 0)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: Wrap(
+                              spacing: 12,
+                              runSpacing: 8,
+                              alignment: WrapAlignment.center,
+                              children: List.generate(expensesByCategory.length, (index) {
+                                final entry = expensesByCategory.entries.elementAt(index);
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('Ingresos', style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
-                                    const SizedBox(height: 6),
+                                    Container(
+                                      width: 12,
+                                      height: 12,
+                                      decoration: BoxDecoration(
+                                        color: colors[index % colors.length],
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
                                     Text(
-                                      'S/. ${totalIncome.toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                          color: GodfatherTheme.successGreen,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20),
+                                      '${entry.key}: S/. ${entry.value.toStringAsFixed(0)}',
+                                      style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight),
                                     ),
                                   ],
-                                ),
-                                Container(width: 1, height: 36, color: GodfatherTheme.borderColor),
-                              ],
-                              Column(
-                                children: [
-                                  Text('Gastos', style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    'S/. ${totalExpenses.toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                        color: GodfatherTheme.alertRed,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
-                                ],
-                              ),
-                              Container(width: 1, height: 36, color: GodfatherTheme.borderColor),
-                              Column(
-                                children: [
-                                  Text(_selectedModule == TargetModule.casa ? 'Balance' : 'Total General',
-                                      style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    'S/. ${balance.abs().toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                        color: balance >= 0 && _selectedModule == TargetModule.casa
-                                            ? GodfatherTheme.primaryGold
-                                            : GodfatherTheme.alertRed,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                );
+                              }),
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
 
-                      // Resumen por Miembro (Familia)
-                      if (_selectedModule == TargetModule.casa && userContributions.isNotEmpty) ...[
+                        // Resumen numérico premium
                         Card(
+                          elevation: 2,
                           color: GodfatherTheme.surfaceDark,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                             side: BorderSide(color: GodfatherTheme.borderColor),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            padding: const EdgeInsets.all(18.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Text(
-                                  'REGISTRADO POR CADA MIEMBRO',
-                                  style: GoogleFonts.cinzel(
-                                    color: GodfatherTheme.primaryGold,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                ...userContributions.entries.map((entry) => Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 6.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                if (_selectedModule == TargetModule.casa) ...[
+                                  Column(
                                     children: [
+                                      Text('Ingresos', style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
+                                      const SizedBox(height: 6),
                                       Text(
-                                        entry.key,
-                                        style: GoogleFonts.inter(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: GodfatherTheme.textLight,
-                                        ),
-                                      ),
-                                      Text(
-                                        'S/. ${entry.value.toStringAsFixed(2)}',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w800,
-                                          color: GodfatherTheme.primaryGold,
-                                        ),
+                                        'S/. ${totalIncome.toStringAsFixed(2)}',
+                                        style: TextStyle(
+                                            color: GodfatherTheme.successGreen,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20),
                                       ),
                                     ],
                                   ),
-                                )),
+                                  Container(width: 1, height: 36, color: GodfatherTheme.borderColor),
+                                ],
+                                Column(
+                                  children: [
+                                    Text('Gastos', style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'S/. ${totalExpenses.toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                          color: GodfatherTheme.alertRed,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                  ],
+                                ),
+                                Container(width: 1, height: 36, color: GodfatherTheme.borderColor),
+                                Column(
+                                  children: [
+                                    Text(_selectedModule == TargetModule.casa ? 'Balance' : 'Total General',
+                                        style: TextStyle(fontSize: 16, color: GodfatherTheme.textLight.withValues(alpha: 0.7))),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'S/. ${balance.abs().toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                          color: balance >= 0 && _selectedModule == TargetModule.casa
+                                              ? GodfatherTheme.primaryGold
+                                              : GodfatherTheme.alertRed,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
                         ),
                         const SizedBox(height: 16),
-                      ],
-                    ],
-                  );
 
-                  Widget rightColumnContent = Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'REGISTROS DEL PERIODO',
-                        style: GoogleFonts.cinzel(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                          color: GodfatherTheme.primaryGold,
-                          fontSize: 20,
+                        // Resumen por Miembro (Familia)
+                        if (_selectedModule == TargetModule.casa && userContributions.isNotEmpty) ...[
+                          Card(
+                            color: GodfatherTheme.surfaceDark,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: GodfatherTheme.borderColor),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'REGISTRADO POR CADA MIEMBRO',
+                                    style: GoogleFonts.cinzel(
+                                      color: GodfatherTheme.primaryGold,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  ...userContributions.entries.map((entry) => Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 6.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          entry.key,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: GodfatherTheme.textLight,
+                                          ),
+                                        ),
+                                        Text(
+                                          'S/. ${entry.value.toStringAsFixed(2)}',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w800,
+                                            color: GodfatherTheme.primaryGold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      ],
+                    );
+
+                    Widget rightColumnContent = Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'REGISTROS DEL PERIODO',
+                          style: GoogleFonts.cinzel(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
+                            color: GodfatherTheme.primaryGold,
+                            fontSize: 20,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: isWide ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
-                        itemCount: moduleTransactions.length,
-                        separatorBuilder: (context, index) => Divider(color: GodfatherTheme.borderColor),
-                        itemBuilder: (context, index) {
-                          final tx = moduleTransactions[index];
-                          final isExpense = tx.transactionType == TransactionType.gasto;
-                          final visuals = GodfatherTheme.getCategoryVisuals(tx.category);
-                          
-                          return Container(
-                            padding: const EdgeInsets.symmetric(vertical: 14.0),
-                            constraints: const BoxConstraints(minHeight: 72),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                        const SizedBox(height: 12),
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: isWide ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+                          itemCount: moduleTransactions.length,
+                          separatorBuilder: (context, index) => Divider(color: GodfatherTheme.borderColor),
+                          itemBuilder: (context, index) {
+                            final tx = moduleTransactions[index];
+                            final isExpense = tx.transactionType == TransactionType.gasto;
+                            final visuals = GodfatherTheme.getCategoryVisuals(tx.category);
+                            
+                            return Container(
+                              padding: const EdgeInsets.symmetric(vertical: 14.0),
+                              constraints: const BoxConstraints(minHeight: 72),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: visuals.bgColor,
+                                      border: Border.all(
+                                        color: visuals.color.withValues(alpha: 0.45),
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Icon(
+                                      visuals.icon,
+                                      color: visuals.color,
+                                      size: 26,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          tx.concept,
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 19,
+                                            color: GodfatherTheme.textLight,
+                                            height: 1.2,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '${tx.category} • ${DateFormat('dd MMM').format(tx.createdAt)}${_selectedModule == TargetModule.casa ? " • Por: ${tx.createdByName ?? 'Miembro'}" : ""}',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: GodfatherTheme.textLight.withValues(alpha: 0.8),
+                                            height: 1.2,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.3),
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 20,
+                                        color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    );
+
+                    bodyWidget = isWide
+                        ? Row(
+                            key: ValueKey<String>('wide_${_selectedDate.month}-$_selectedModule-${moduleTransactions.length}'),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 5,
+                                child: SingleChildScrollView(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: leftColumnContent,
+                                ),
+                              ),
+                              VerticalDivider(color: GodfatherTheme.borderColor, width: 1),
+                              Expanded(
+                                flex: 6,
+                                child: SingleChildScrollView(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: rightColumnContent,
+                                ),
+                              ),
+                            ],
+                          )
+                        : SingleChildScrollView(
+                            key: ValueKey<String>('narrow_${_selectedDate.month}-$_selectedModule-${moduleTransactions.length}'),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Container(
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: visuals.bgColor,
-                                    border: Border.all(
-                                      color: visuals.color.withValues(alpha: 0.45),
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Icon(
-                                    visuals.icon,
-                                    color: visuals.color,
-                                    size: 26,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        tx.concept,
-                                        style: GoogleFonts.inter(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 19,
-                                          color: GodfatherTheme.textLight,
-                                          height: 1.2,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '${tx.category} • ${DateFormat('dd MMM').format(tx.createdAt)}${_selectedModule == TargetModule.casa ? " • Por: ${tx.createdByName ?? 'Miembro'}" : ""}',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: GodfatherTheme.textLight.withValues(alpha: 0.8),
-                                          height: 1.2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: (isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen).withValues(alpha: 0.3),
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    '${isExpense ? "-" : "+"} S/. ${tx.amount.toStringAsFixed(2)}',
-                                    style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 20,
-                                      color: isExpense ? GodfatherTheme.alertRed : GodfatherTheme.successGreen,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                ),
+                                leftColumnContent,
+                                const SizedBox(height: 24),
+                                rightColumnContent,
+                                const SizedBox(height: 32),
                               ],
                             ),
                           );
-                        },
-                      ),
-                    ],
-                  );
+                  }
 
-                  return isWide
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              flex: 5,
-                              child: SingleChildScrollView(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                child: leftColumnContent,
-                              ),
-                            ),
-                            VerticalDivider(color: GodfatherTheme.borderColor, width: 1),
-                            Expanded(
-                              flex: 6,
-                              child: SingleChildScrollView(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                child: rightColumnContent,
-                              ),
-                            ),
-                          ],
-                        )
-                      : SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              leftColumnContent,
-                              const SizedBox(height: 24),
-                              rightColumnContent,
-                              const SizedBox(height: 32),
-                            ],
-                          ),
-                        );
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    child: bodyWidget,
+                  );
                 },
               ),
             ),

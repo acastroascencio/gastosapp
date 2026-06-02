@@ -441,7 +441,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     );
   }
 
-  // Custom Grid Category Selector builder
   Widget _buildCategorySelector({
     required List<CategoryItem> items,
     required String selectedCategory,
@@ -449,7 +448,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     required ValueChanged<String> onSelected,
   }) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
           'CATEGORÍA',
@@ -461,86 +460,94 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           ),
         ),
         const SizedBox(height: 12),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 110,
-            mainAxisExtent: 98, // Uniform height for senior chips
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-          ),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            final item = items[index];
-            final isSelected = selectedCategory == item.label;
-            final visuals = GodfatherTheme.getCategoryVisuals(item.label);
-            return GestureDetector(
-              onTap: () => onSelected(item.label),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                decoration: BoxDecoration(
-                  color: isSelected 
-                      ? visuals.bgColor.withValues(alpha: 0.25) 
+        Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 10,
+            runSpacing: 10,
+            children: items.map((item) {
+              final isSelected = selectedCategory == item.label;
+              final visuals = GodfatherTheme.getCategoryVisuals(item.label);
+              return SizedBox(
+                width: 130, // Ancho fijo controlado para cada chip
+                height: 125, // Altura fija controlada para 2 líneas
+                child: GestureDetector(
+                  onTap: () => onSelected(item.label),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeInOut,
+                    decoration: BoxDecoration(
+                      color: isSelected 
+                          ? visuals.bgColor.withValues(alpha: 0.25) 
                       : GodfatherTheme.surfaceDark,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isSelected 
-                        ? (ref.watch(themeModeProvider) == ThemeMode.dark ? GodfatherTheme.goldActive : GodfatherTheme.primaryGold)
-                        : GodfatherTheme.borderColor,
-                    width: isSelected ? 3.0 : 1.5,
-                  ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: visuals.color.withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            spreadRadius: 1.0,
-                          )
-                        ]
-                      : null,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: visuals.bgColor,
-                        border: Border.all(
-                          color: visuals.color.withValues(alpha: 0.45),
-                          width: 1.5,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isSelected 
+                            ? (ref.watch(themeModeProvider) == ThemeMode.dark ? GodfatherTheme.goldActive : GodfatherTheme.primaryGold)
+                            : GodfatherTheme.borderColor,
+                        width: isSelected ? 3.0 : 1.5,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: visuals.color.withValues(alpha: 0.3),
+                                blurRadius: 10,
+                                spreadRadius: 1.0,
+                              )
+                            ]
+                          : null,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        AnimatedScale(
+                          scale: isSelected ? 1.08 : 1.0,
+                          duration: const Duration(milliseconds: 180),
+                          curve: Curves.easeOutCubic,
+                          child: Container(
+                            width: 54, // Icon wrapper width
+                            height: 54, // Icon wrapper height
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: visuals.bgColor,
+                              border: Border.all(
+                                color: visuals.color.withValues(alpha: 0.45),
+                                width: 1.5,
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              visuals.icon,
+                              color: visuals.color,
+                              size: 34,
+                            ),
+                          ),
                         ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        visuals.icon,
-                        color: visuals.color,
-                        size: 34,
-                      ),
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                          child: Text(
+                            item.label,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: GodfatherTheme.textLight,
+                              height: 1.15,
+                            ),
+                            maxLines: 2,
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      item.label,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: GodfatherTheme.textLight,
-                        height: 1.2,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -856,18 +863,26 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                       const SizedBox(height: 16),
 
                       // Grid-Selector for Categories
-                      _buildCategorySelector(
-                        items: activeCategoryList,
-                        selectedCategory: _selectedCategory,
-                        themeColor: themeColor,
-                        onSelected: (val) {
-                          setState(() {
-                            _selectedCategory = val;
-                            if (val != 'Otros' && val != 'Otro') {
-                              _categoryController.clear();
-                            }
-                          });
-                        },
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        child: KeyedSubtree(
+                          key: ValueKey<String>('${_type.toString()}_${_target.toString()}'),
+                          child: _buildCategorySelector(
+                            items: activeCategoryList,
+                            selectedCategory: _selectedCategory,
+                            themeColor: themeColor,
+                            onSelected: (val) {
+                              setState(() {
+                                _selectedCategory = val;
+                                if (val != 'Otros' && val != 'Otro') {
+                                  _categoryController.clear();
+                                }
+                              });
+                            },
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 16),
 
