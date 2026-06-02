@@ -54,7 +54,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                     child: ChoiceChip(
                       showCheckmark: false,
                       labelPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                      label: const Center(child: Text('PERSONALES')),
+                      label: const Align(
+                        alignment: Alignment.center,
+                        child: Text('PERSONALES'),
+                      ),
                       selected: _selectedModule == TargetModule.personal,
                       selectedColor: GodfatherTheme.primaryGold.withValues(alpha: 0.2),
                       backgroundColor: GodfatherTheme.surfaceDarkAlt,
@@ -82,7 +85,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                     child: ChoiceChip(
                       showCheckmark: false,
                       labelPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                      label: const Center(child: Text('DE LA CASA')),
+                      label: const Align(
+                        alignment: Alignment.center,
+                        child: Text('DE LA CASA'),
+                      ),
                       selected: _selectedModule == TargetModule.casa,
                       selectedColor: GodfatherTheme.primaryGold.withValues(alpha: 0.2),
                       backgroundColor: GodfatherTheme.surfaceDarkAlt,
