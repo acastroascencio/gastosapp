@@ -56,14 +56,21 @@ class MyApp extends ConsumerWidget {
             ),
           ),
         ),
-        error: (error, stack) => Scaffold(
-          body: Center(
-            child: Text(
-              'Error en la conexión con Supabase: $error',
-              style: TextStyle(color: GodfatherTheme.alertRed),
-            ),
-          ),
-        ),
+        error: (error, stack) {
+          // Log del error para depuración
+          debugPrint('Error de autenticación de Supabase: $error');
+          
+          // Limpiar sesión local corrupta en segundo plano para evitar bucles de error
+          Future.microtask(() async {
+            try {
+              final client = ref.read(supabaseClientProvider);
+              await client.auth.signOut();
+            } catch (_) {}
+          });
+          
+          // Retornar la pantalla de Login en lugar de colapsar la app
+          return const LoginScreen();
+        },
       ),
     );
   }
