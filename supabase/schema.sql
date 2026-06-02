@@ -71,12 +71,24 @@ CREATE POLICY "Cualquier usuario autenticado puede crear familias"
 ON public.families FOR INSERT
 WITH CHECK (auth.uid() = created_by OR auth.uid() = admin_user_id);
 
+-- Función SECURITY DEFINER para verificar membresía de familia sin recursión de RLS
+CREATE OR REPLACE FUNCTION public.check_is_family_member(fam_id UUID, usr_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM public.family_members
+        WHERE family_members.family_id = fam_id AND family_members.user_id = usr_id
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 CREATE POLICY "Miembros pueden ver miembros de su familia"
 ON public.family_members FOR SELECT
-USING (EXISTS (
-    SELECT 1 FROM public.family_members AS fm
-    WHERE fm.family_id = family_id AND fm.user_id = auth.uid()
-));
+USING (
+    auth.uid() = user_id 
+    OR 
+    public.check_is_family_member(family_id, auth.uid())
+);
 
 CREATE POLICY "Admins pueden agregar/modificar miembros"
 ON public.family_members FOR ALL
