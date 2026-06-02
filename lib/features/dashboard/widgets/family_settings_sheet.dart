@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart' hide Family;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remixicon/remixicon.dart';
 import '../../../core/theme.dart';
+import '../../../models/transaction.dart';
+import '../../../models/family.dart';
 import '../../../core/supabase_service.dart';
 
 class FamilySettingsSheet extends ConsumerStatefulWidget {
@@ -74,6 +76,8 @@ class _FamilySettingsSheetState extends ConsumerState<FamilySettingsSheet> {
     final selectedFamily = ref.watch(selectedFamilyProvider);
     final currentUser = ref.watch(currentUserProvider);
     final currentUserId = currentUser?.id ?? 'guest-user-id';
+    final transactionsAsync = ref.watch(transactionProvider);
+    final allTransactions = transactionsAsync.value ?? [];
 
     return Container(
       decoration: BoxDecoration(
@@ -286,6 +290,42 @@ class _FamilySettingsSheetState extends ConsumerState<FamilySettingsSheet> {
                                     style: TextStyle(color: GodfatherTheme.primaryGold, fontWeight: FontWeight.bold),
                                   ),
                                 ),
+                              
+                              const SizedBox(height: 16),
+                              const Divider(color: Colors.redAccent, thickness: 1.5),
+                              const SizedBox(height: 8),
+                              Text(
+                                'ZONA DE PELIGRO',
+                                style: GoogleFonts.cinzel(
+                                  color: GodfatherTheme.alertRed,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: (family.createdBy == currentUserId) ? GodfatherTheme.alertRed : Colors.grey.shade800,
+                                  foregroundColor: Colors.white,
+                                  minimumSize: const Size(double.infinity, 56),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: BorderSide(
+                                      color: (family.createdBy == currentUserId) ? GodfatherTheme.alertRed : Colors.transparent,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                ),
+                                onPressed: (family.createdBy == currentUserId)
+                                    ? () => _showDeleteFamilyDialog(family, allTransactions)
+                                    : () => _showSnackBar('Solo el creador puede eliminar esta familia', GodfatherTheme.alertRed),
+                                icon: const Icon(RemixIcons.delete_bin_fill, size: 22),
+                                label: Text(
+                                  (family.createdBy == currentUserId) ? 'ELIMINAR FAMILIA' : 'SOLO EL CREADOR PUEDE ELIMINAR',
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                ),
+                              ),
                             ],
                           ),
                         );
@@ -313,30 +353,42 @@ class _FamilySettingsSheetState extends ConsumerState<FamilySettingsSheet> {
         Form(
           key: _createFormKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'CREAR NUEVA FAMILIA',
                 style: GoogleFonts.cinzel(
                   color: GodfatherTheme.primaryGold,
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 1.0,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Nombre de la Familia',
+                style: TextStyle(
+                  color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _familyNameController,
-                style: TextStyle(color: GodfatherTheme.textLight),
-                decoration: const InputDecoration(
-                  labelText: 'Nombre de la Familia (Ej. Familia Castro)',
-                  prefixIcon: Icon(RemixIcons.home_gear_line),
+                style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                decoration: InputDecoration(
+                  hintText: 'Ej. Familia Castro',
+                  hintStyle: TextStyle(color: GodfatherTheme.textMuted.withOpacity(0.5), fontSize: 16),
+                  prefixIcon: Icon(RemixIcons.home_gear_line, color: GodfatherTheme.primaryGold),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) return 'Ingresa un nombre';
                   return null;
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 56),
@@ -349,36 +401,48 @@ class _FamilySettingsSheetState extends ConsumerState<FamilySettingsSheet> {
             ],
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
 
         // UNIRSE A FAMILIA
         Form(
           key: _joinFormKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'UNIRSE A UNA FAMILIA',
                 style: GoogleFonts.cinzel(
                   color: GodfatherTheme.primaryGold,
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 1.0,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Código de Invitación',
+                style: TextStyle(
+                  color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _inviteCodeController,
-                style: TextStyle(color: GodfatherTheme.textLight),
-                decoration: const InputDecoration(
-                  labelText: 'Código de Invitación (Ej. CASTRO-8392)',
-                  prefixIcon: Icon(RemixIcons.qr_code_line),
+                style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                decoration: InputDecoration(
+                  hintText: 'Ej. CASTRO-8392',
+                  hintStyle: TextStyle(color: GodfatherTheme.textMuted.withOpacity(0.5), fontSize: 16),
+                  prefixIcon: Icon(RemixIcons.qr_code_line, color: GodfatherTheme.primaryGold),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) return 'Ingresa el código';
                   return null;
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 56),
@@ -398,33 +462,288 @@ class _FamilySettingsSheetState extends ConsumerState<FamilySettingsSheet> {
   void _regenerateCode(String familyId) {
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.55),
       builder: (ctx) => AlertDialog(
         backgroundColor: GodfatherTheme.surfaceDark,
-        title: Text('Regenerar Código', style: TextStyle(color: GodfatherTheme.primaryGold)),
-        content: const Text(
-          'Al regenerar el código de invitación, el anterior dejará de funcionar de forma inmediata. ¿Deseas continuar?',
-          style: TextStyle(color: Colors.white, fontSize: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: GodfatherTheme.primaryGold, width: 2),
+        ),
+        title: Text(
+          'Regenerar código de invitación',
+          style: GoogleFonts.cinzel(
+            color: GodfatherTheme.primaryGold,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '¿Estás seguro de que deseas regenerar el código de invitación de esta familia?',
+              style: TextStyle(
+                color: GodfatherTheme.textLight,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: GodfatherTheme.alertRed.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: GodfatherTheme.alertRed, width: 1),
+              ),
+              child: Text(
+                'Advertencia:\nEl código anterior dejará de funcionar de forma inmediata. Los miembros actuales permanecerán dentro de la familia.',
+                style: TextStyle(
+                  color: GodfatherTheme.alertRed,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('CANCELAR', style: TextStyle(color: GodfatherTheme.primaryGold)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: GodfatherTheme.primaryGold),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              try {
-                await ref.read(familyProvider.notifier).regenerateInviteCode(familyId);
-                _showSnackBar('¡Código de invitación regenerado con éxito!', GodfatherTheme.successGreen);
-              } catch (e) {
-                _showSnackBar('Error al regenerar: $e', GodfatherTheme.alertRed);
-              }
-            },
-            child: const Text('SÍ, REGENERAR', style: TextStyle(color: Colors.black)),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, 56),
+                    side: BorderSide(color: GodfatherTheme.textMuted, width: 1.5),
+                  ),
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text(
+                    'CANCELAR',
+                    style: TextStyle(color: GodfatherTheme.textLight, fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: GodfatherTheme.primaryGold,
+                    foregroundColor: GodfatherTheme.backgroundBlack,
+                    minimumSize: const Size(0, 56),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(ctx);
+                    try {
+                      await ref.read(familyProvider.notifier).regenerateInviteCode(familyId);
+                      _showSnackBar('¡Código de invitación regenerado con éxito!', GodfatherTheme.successGreen);
+                    } catch (e) {
+                      _showSnackBar('Error al regenerar: $e', GodfatherTheme.alertRed);
+                    }
+                  },
+                  child: const Text(
+                    'SÍ, REGENERAR',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
+    );
+  }
+
+  void _showDeleteFamilyDialog(Family family, List<Transaction> allTransactions) {
+    final familyTransactions = allTransactions.where((tx) => tx.familyId == family.id && !tx.deleted).toList();
+    final memberCount = family.members.length;
+    final expensesCount = familyTransactions.where((tx) => tx.transactionType == TransactionType.gasto).length;
+    final abonosCount = familyTransactions.where((tx) => tx.transactionType == TransactionType.abono).length;
+
+    final nameConfirmController = TextEditingController();
+    bool isMatch = false;
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.55),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: GodfatherTheme.surfaceDark,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: GodfatherTheme.alertRed, width: 2),
+              ),
+              title: Row(
+                children: [
+                  Icon(RemixIcons.delete_bin_fill, color: GodfatherTheme.alertRed, size: 26),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'ELIMINAR FAMILIA',
+                      style: GoogleFonts.cinzel(
+                        color: GodfatherTheme.alertRed,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Esta acción eliminará la familia y dejará de estar disponible para todos los miembros.',
+                      style: TextStyle(
+                        color: GodfatherTheme.textLight,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Los miembros ya no podrán ver ni registrar gastos en esta familia.',
+                      style: TextStyle(
+                        color: GodfatherTheme.textMuted,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Resumen de datos a archivar
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: GodfatherTheme.primaryGold.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: GodfatherTheme.primaryGold.withOpacity(0.4), width: 1),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Esta familia contiene:',
+                            style: TextStyle(
+                              color: GodfatherTheme.primaryGold,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text('• $memberCount miembros actuales', style: const TextStyle(fontSize: 15, color: Colors.white)),
+                          Text('• $expensesCount gastos registrados', style: const TextStyle(fontSize: 15, color: Colors.white)),
+                          Text('• $abonosCount abonos registrados', style: const TextStyle(fontSize: 15, color: Colors.white)),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Estos datos quedarán archivados y la familia dejará de estar activa.',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontStyle: FontStyle.italic,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Campo de confirmación externa
+                    Text(
+                      'Para confirmar, escribe el nombre de la familia:\n"${family.name}"',
+                      style: TextStyle(
+                        color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      controller: nameConfirmController,
+                      style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
+                      decoration: InputDecoration(
+                        hintText: 'Escribir nombre de la familia',
+                        hintStyle: TextStyle(color: GodfatherTheme.textMuted.withOpacity(0.5), fontSize: 16),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: isMatch ? GodfatherTheme.successGreen : GodfatherTheme.borderColor,
+                            width: 1.5,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: isMatch ? GodfatherTheme.successGreen : GodfatherTheme.alertRed,
+                            width: 2.0,
+                          ),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        setDialogState(() {
+                          isMatch = val.trim() == family.name.trim();
+                        });
+                      },
+                    ),
+                    if (nameConfirmController.text.isNotEmpty && !isMatch) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        'El nombre ingresado no coincide exactamente.',
+                        style: TextStyle(color: GodfatherTheme.alertRed, fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(0, 56),
+                          side: BorderSide(color: GodfatherTheme.textMuted, width: 1.5),
+                        ),
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text(
+                          'CANCELAR',
+                          style: TextStyle(color: GodfatherTheme.textLight, fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isMatch ? GodfatherTheme.alertRed : Colors.grey.shade800,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(0, 56),
+                        ),
+                        onPressed: isMatch
+                            ? () async {
+                                Navigator.pop(ctx);
+                                try {
+                                  await ref.read(familyProvider.notifier).deleteFamily(family.id);
+                                  _showSnackBar('Familia eliminada con éxito y archivada.', GodfatherTheme.successGreen);
+                                } catch (e) {
+                                  _showSnackBar('Error al eliminar: $e', GodfatherTheme.alertRed);
+                                }
+                              }
+                            : null,
+                        child: const Text(
+                          'ELIMINAR',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

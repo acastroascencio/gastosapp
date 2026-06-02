@@ -51,6 +51,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 }
 
 class GodfatherTheme {
+  static bool isDarkMode = true;
   // Colores dinámicos mutables que cambian en runtime según el tema seleccionado
   static Color primaryGold = const Color(0xFFD4AF37); // Oro elegante
   static Color goldActive = const Color(0xFFF2C94C); // Dorado activo
@@ -70,6 +71,7 @@ class GodfatherTheme {
   // Actualiza los colores en caliente al cambiar de modo
   static void updateTheme(ThemeMode mode) {
     if (mode == ThemeMode.dark) {
+      isDarkMode = true;
       primaryGold = const Color(0xFFD4AF37);
       goldActive = const Color(0xFFF2C94C);
       secondaryGold = const Color(0xFF996515);
@@ -85,6 +87,7 @@ class GodfatherTheme {
       iconBgColor = const Color(0x29F2C94C);
       iconBorderColor = const Color(0x73F2C94C);
     } else {
+      isDarkMode = false;
       primaryGold = const Color(0xFF9A6F00);
       goldActive = const Color(0xFFB88700);
       secondaryGold = const Color(0xFF996515);

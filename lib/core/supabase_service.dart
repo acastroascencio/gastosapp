@@ -243,6 +243,14 @@ class TransactionNotifier extends StateNotifier<AsyncValue<List<model.Transactio
   }) async {
     final now = DateTime.now();
     final currentUserName = _ref.read(profileProvider).value?.fullName ?? 'Mario Castro';
+
+    if (target == model.TargetModule.casa && familyId != null) {
+      final families = _ref.read(familyProvider).value ?? [];
+      final hasActiveFamily = families.any((f) => f.id == familyId && !f.deleted);
+      if (!hasActiveFamily) {
+        throw Exception('No se pueden registrar gastos en una familia inactiva o eliminada.');
+      }
+    }
     
     if (_userId == null) {
       final newTx = model.Transaction(
@@ -345,6 +353,14 @@ class TransactionNotifier extends StateNotifier<AsyncValue<List<model.Transactio
   }) async {
     final now = DateTime.now();
     final currentUserName = _ref.read(profileProvider).value?.fullName ?? 'Mario Castro';
+
+    if (target == model.TargetModule.casa && familyId != null) {
+      final families = _ref.read(familyProvider).value ?? [];
+      final hasActiveFamily = families.any((f) => f.id == familyId && !f.deleted);
+      if (!hasActiveFamily) {
+        throw Exception('No se pueden registrar gastos en una familia inactiva o eliminada.');
+      }
+    }
 
     if (_userId == null) {
       final index = _localBypassTransactions.indexWhere((tx) => tx.id == id);
@@ -680,7 +696,7 @@ class FamilyNotifier extends StateNotifier<AsyncValue<List<Family>>> {
 
   Future<void> loadFamilies() async {
     if (_userId == null) {
-      state = AsyncValue.data(List.from(_localBypassFamilies));
+      state = AsyncValue.data(List.from(_localBypassFamilies.where((f) => !f.deleted)));
       return;
     }
     state = const AsyncValue.loading();
@@ -703,6 +719,7 @@ class FamilyNotifier extends StateNotifier<AsyncValue<List<Family>>> {
       final familiesResponse = await _client
           .from('families')
           .select('*, family_members(*, profiles(full_name))')
+          .eq('deleted', false)
           .inFilter('id', familyIds);
 
       final List<dynamic> data = familiesResponse as List<dynamic>;
@@ -725,6 +742,9 @@ class FamilyNotifier extends StateNotifier<AsyncValue<List<Family>>> {
           members: parsedMembers,
           createdAt: DateTime.parse(json['created_at'] as String),
           updatedAt: DateTime.parse(json['updated_at'] as String),
+          deleted: json['deleted'] as bool? ?? false,
+          deletedBy: json['deleted_by'] as String?,
+          deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at'] as String) : null,
         );
       }).toList();
 
@@ -786,7 +806,7 @@ class FamilyNotifier extends StateNotifier<AsyncValue<List<Family>>> {
     final uppercaseCode = inviteCode.trim().toUpperCase();
 
     if (_userId == null) {
-      final index = _localBypassFamilies.indexWhere((f) => f.inviteCode == uppercaseCode);
+      final index = _localBypassFamilies.indexWhere((f) => f.inviteCode == uppercaseCode && !f.deleted);
       if (index >= 0) {
         final family = _localBypassFamilies[index];
         if (!family.members.any((m) => m.userId == 'guest-user-id')) {
@@ -795,11 +815,11 @@ class FamilyNotifier extends StateNotifier<AsyncValue<List<Family>>> {
           
           final updatedFamily = family.copyWith(members: updatedMembers);
           _localBypassFamilies[index] = updatedFamily;
-          state = AsyncValue.data(List.from(_localBypassFamilies));
+          state = AsyncValue.data(List.from(_localBypassFamilies.where((f) => !f.deleted)));
           _ref.read(selectedFamilyProvider.notifier).update((_) => updatedFamily);
         }
       } else {
-        throw Exception('Código de invitación inválido');
+        throw Exception('Código de invitación inválido o familia no disponible.');
       }
       return;
     }
@@ -807,12 +827,13 @@ class FamilyNotifier extends StateNotifier<AsyncValue<List<Family>>> {
     try {
       final familyResponse = await _client
           .from('families')
-          .select('id')
+          .select('id, deleted')
           .eq('invite_code', uppercaseCode)
+          .eq('deleted', false)
           .maybeSingle();
 
       if (familyResponse == null) {
-        throw Exception('El código de invitación no existe.');
+        throw Exception('El código de invitación no existe o la familia fue eliminada.');
       }
 
       final familyId = familyResponse['id'] as String;
@@ -840,12 +861,36 @@ class FamilyNotifier extends StateNotifier<AsyncValue<List<Family>>> {
     if (_userId == null) {
       final index = _localBypassFamilies.indexWhere((f) => f.id == familyId);
       if (index >= 0) {
-        final updatedFamily = _localBypassFamilies[index].copyWith(
+        final previousFamily = _localBypassFamilies[index];
+        final updatedFamily = previousFamily.copyWith(
           inviteCode: newCode,
           updatedAt: now,
         );
         _localBypassFamilies[index] = updatedFamily;
-        state = AsyncValue.data(List.from(_localBypassFamilies));
+
+        // Audit log
+        _ref.read(auditProvider.notifier).addLocalAudit(
+          transactionId: 'regen-$familyId',
+          familyId: familyId,
+          action: 'updated',
+          previousData: {'invite_code': previousFamily.inviteCode},
+          newData: {'invite_code': newCode},
+        );
+
+        // Notifications
+        for (var member in family.members) {
+          if (member.userId != 'guest-user-id') {
+            _ref.read(notificationProvider.notifier).addLocalNotification(
+              familyId: familyId,
+              recipientUserId: member.userId,
+              type: 'code_regenerated',
+              title: 'Código regenerado',
+              message: 'El código de invitación de la familia ${family.name} fue regenerado por Mario Castro.',
+            );
+          }
+        }
+
+        state = AsyncValue.data(List.from(_localBypassFamilies.where((f) => !f.deleted)));
         _ref.read(selectedFamilyProvider.notifier).update((_) => updatedFamily);
       }
       return;
@@ -856,6 +901,161 @@ class FamilyNotifier extends StateNotifier<AsyncValue<List<Family>>> {
           .from('families')
           .update({'invite_code': newCode, 'updated_at': now.toIso8601String()})
           .eq('id', familyId);
+
+      // Audit log
+      await _client.from('transaction_audits').insert({
+        'transaction_id': 'regen-$familyId',
+        'family_id': familyId,
+        'action': 'updated',
+        'performed_by': _userId,
+        'previous_data': {'invite_code': family.inviteCode},
+        'new_data': {'invite_code': newCode},
+      });
+
+      // Get profile name
+      final profileResponse = await _client
+          .from('profiles')
+          .select('full_name')
+          .eq('id', _userId)
+          .single();
+      final String performerName = profileResponse['full_name'] as String? ?? 'Administrador';
+
+      // Notifications
+      final notifications = family.members
+          .where((m) => m.userId != _userId)
+          .map((m) => {
+                'family_id': familyId,
+                'recipient_user_id': m.userId,
+                'triggered_by': _userId,
+                'type': 'code_regenerated',
+                'title': 'Código regenerado',
+                'message': 'El código de invitación de la familia ${family.name} fue regenerado por $performerName.',
+              })
+          .toList();
+
+      if (notifications.isNotEmpty) {
+        await _client.from('notifications').insert(notifications);
+      }
+
+      await loadFamilies();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteFamily(String familyId) async {
+    final now = DateTime.now();
+    final family = state.value?.firstWhere((f) => f.id == familyId);
+    if (family == null) return;
+
+    final currentUserId = _userId ?? 'guest-user-id';
+    if (family.createdBy != currentUserId) {
+      throw Exception('Solo el creador puede eliminar esta familia');
+    }
+
+    if (_userId == null) {
+      final index = _localBypassFamilies.indexWhere((f) => f.id == familyId);
+      if (index >= 0) {
+        final updatedFamily = _localBypassFamilies[index].copyWith(
+          deleted: true,
+          deletedBy: 'guest-user-id',
+          deletedAt: now,
+        );
+        _localBypassFamilies[index] = updatedFamily;
+        
+        // Remove from active selection if selected
+        final selectedFam = _ref.read(selectedFamilyProvider);
+        if (selectedFam?.id == familyId) {
+          _ref.read(selectedFamilyProvider.notifier).update((_) => null);
+        }
+        
+        // Trigger local audit
+        _ref.read(auditProvider.notifier).addLocalAudit(
+          transactionId: 'deletion-$familyId',
+          familyId: familyId,
+          action: 'family_deleted',
+          previousData: family.toJson(),
+          newData: {
+            'deleted': true,
+            'deleted_by': 'guest-user-id',
+            'deleted_at': now.toIso8601String(),
+          },
+        );
+
+        // Trigger local notification for all members (except current user)
+        for (var member in family.members) {
+          if (member.userId != 'guest-user-id') {
+            _ref.read(notificationProvider.notifier).addLocalNotification(
+              familyId: familyId,
+              recipientUserId: member.userId,
+              type: 'family_deleted',
+              title: 'Familia eliminada',
+              message: 'La familia ${family.name} fue eliminada por Mario Castro.',
+            );
+          }
+        }
+
+        await loadFamilies();
+      }
+      return;
+    }
+
+    try {
+      // 1. Soft-delete family in Supabase
+      await _client
+          .from('families')
+          .update({
+            'deleted': true,
+            'deleted_by': _userId,
+            'deleted_at': now.toIso8601String(),
+            'updated_at': now.toIso8601String(),
+          })
+          .eq('id', familyId);
+
+      // 2. Fetch current user's profile to get name
+      final profileResponse = await _client
+          .from('profiles')
+          .select('full_name')
+          .eq('id', _userId)
+          .single();
+      final String performerName = profileResponse['full_name'] as String? ?? 'Administrador';
+
+      // 3. Create Audit log
+      await _client.from('transaction_audits').insert({
+        'transaction_id': 'deletion-$familyId',
+        'family_id': familyId,
+        'action': 'family_deleted',
+        'performed_by': _userId,
+        'previous_data': family.toJson(),
+        'new_data': {
+          'deleted': true,
+          'deleted_by': _userId,
+          'deleted_at': now.toIso8601String(),
+        },
+      });
+
+      // 4. Send notifications to all members (except current user)
+      final notifications = family.members
+          .where((m) => m.userId != _userId)
+          .map((m) => {
+                'family_id': familyId,
+                'recipient_user_id': m.userId,
+                'triggered_by': _userId,
+                'type': 'family_deleted',
+                'title': 'Familia eliminada',
+                'message': 'La familia ${family.name} fue eliminada por $performerName.',
+              })
+          .toList();
+
+      if (notifications.isNotEmpty) {
+        await _client.from('notifications').insert(notifications);
+      }
+
+      // 5. Remove from active selection if selected
+      final selectedFam = _ref.read(selectedFamilyProvider);
+      if (selectedFam?.id == familyId) {
+        _ref.read(selectedFamilyProvider.notifier).update((_) => null);
+      }
 
       await loadFamilies();
     } catch (e) {
@@ -1128,6 +1328,30 @@ class NotificationNotifier extends StateNotifier<AsyncValue<List<FamilyNotificat
       read: false,
       createdAt: now,
       triggeredByName: 'Brenda Castro',
+    );
+    _localBypassNotifications.insert(0, newNotif);
+    state = AsyncValue.data(List.from(_localBypassNotifications));
+  }
+
+  void addLocalNotification({
+    required String familyId,
+    required String recipientUserId,
+    required String type,
+    required String title,
+    required String message,
+  }) {
+    final now = DateTime.now();
+    final newNotif = FamilyNotification(
+      id: 'notif-${now.millisecondsSinceEpoch}',
+      familyId: familyId,
+      recipientUserId: recipientUserId,
+      triggeredBy: 'guest-user-id',
+      type: type,
+      title: title,
+      message: message,
+      read: false,
+      createdAt: now,
+      triggeredByName: 'Mario Castro',
     );
     _localBypassNotifications.insert(0, newNotif);
     state = AsyncValue.data(List.from(_localBypassNotifications));

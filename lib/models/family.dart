@@ -38,6 +38,9 @@ class Family {
   final List<FamilyMember> members;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool deleted;
+  final String? deletedBy;
+  final DateTime? deletedAt;
 
   Family({
     required this.id,
@@ -48,6 +51,9 @@ class Family {
     required this.members,
     required this.createdAt,
     required this.updatedAt,
+    this.deleted = false,
+    this.deletedBy,
+    this.deletedAt,
   });
 
   factory Family.fromJson(Map<String, dynamic> json) {
@@ -65,6 +71,9 @@ class Family {
       members: parsedMembers,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      deleted: json['deleted'] as bool? ?? false,
+      deletedBy: json['deleted_by'] as String?,
+      deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at'] as String) : null,
     );
   }
 
@@ -78,6 +87,9 @@ class Family {
       'members': members.map((m) => m.toJson()).toList(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
+      'deleted': deleted,
+      'deleted_by': deletedBy,
+      'deleted_at': deletedAt?.toIso8601String(),
     };
   }
 
@@ -90,6 +102,9 @@ class Family {
     List<FamilyMember>? members,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? deleted,
+    String? deletedBy,
+    DateTime? deletedAt,
   }) {
     return Family(
       id: id ?? this.id,
@@ -100,6 +115,9 @@ class Family {
       members: members ?? this.members,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      deleted: deleted ?? this.deleted,
+      deletedBy: deletedBy ?? this.deletedBy,
+      deletedAt: deletedAt ?? this.deletedAt,
     );
   }
 }

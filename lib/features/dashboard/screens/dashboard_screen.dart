@@ -261,30 +261,49 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               const SizedBox(height: 20),
               
               // Campo Nombre Completo
+              Text(
+                'Nombre completo',
+                style: TextStyle(
+                  color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 8),
               TextField(
                 controller: nameController,
-                style: TextStyle(color: GodfatherTheme.textLight),
+                style: TextStyle(color: GodfatherTheme.textLight, fontSize: 18),
                 decoration: InputDecoration(
-                  labelText: 'Nombre Completo',
+                  hintText: 'Ej. Don Corleone',
                   prefixIcon: Icon(Icons.person_outline, color: GodfatherTheme.primaryGold),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                 ),
               ),
               const SizedBox(height: 16),
               
               // Campo Correo Electrónico (Solo Lectura)
+              Text(
+                'Correo electrónico',
+                style: TextStyle(
+                  color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 8),
               TextField(
                 controller: TextEditingController(text: currentEmail),
                 enabled: false,
-                style: TextStyle(color: GodfatherTheme.textMuted),
+                style: TextStyle(
+                  color: GodfatherTheme.isDarkMode ? Colors.white60 : Colors.black54,
+                  fontSize: 18,
+                ),
                 decoration: InputDecoration(
-                  labelText: 'Correo Electrónico (Fijo)',
-                  prefixIcon: Icon(Icons.email_outlined, color: GodfatherTheme.textMuted),
-                  fillColor: const Color(0xFF131316),
+                  hintText: 'invitado@corleone.com',
+                  prefixIcon: Icon(Icons.mail_outline, color: GodfatherTheme.primaryGold),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                  fillColor: GodfatherTheme.isDarkMode ? Colors.black38 : Colors.grey.shade300,
                   filled: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
                 ),
               ),
             ],

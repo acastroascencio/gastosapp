@@ -27,6 +27,9 @@ CREATE TABLE public.families (
     invite_code TEXT UNIQUE NOT NULL,
     created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     admin_user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    deleted BOOLEAN DEFAULT false NOT NULL,
+    deleted_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    deleted_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
@@ -166,7 +169,7 @@ CREATE TABLE public.transaction_audits (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     transaction_id UUID NOT NULL,
     family_id UUID REFERENCES public.families(id) ON DELETE CASCADE NOT NULL,
-    action TEXT NOT NULL CHECK (action IN ('created', 'updated', 'deleted')),
+    action TEXT NOT NULL CHECK (action IN ('created', 'updated', 'deleted', 'family_deleted')),
     performed_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL NOT NULL,
     previous_data JSONB,
     new_data JSONB,
@@ -195,7 +198,7 @@ CREATE TABLE public.notifications (
     family_id UUID REFERENCES public.families(id) ON DELETE CASCADE NOT NULL,
     recipient_user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     triggered_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL NOT NULL,
-    type TEXT NOT NULL CHECK (type IN ('transaction_created', 'transaction_updated', 'transaction_deleted')),
+    type TEXT NOT NULL CHECK (type IN ('transaction_created', 'transaction_updated', 'transaction_deleted', 'family_deleted', 'code_regenerated')),
     title TEXT NOT NULL,
     message TEXT NOT NULL,
     read BOOLEAN DEFAULT false NOT NULL,

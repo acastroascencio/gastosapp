@@ -99,9 +99,13 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
                           style: TextStyle(color: GodfatherTheme.primaryGold, fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
+                        Text(
                           'No guardamos contraseñas de tu correo. Buscamos de forma encriptada transacciones del BCP.',
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                          style: TextStyle(
+                            color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
@@ -205,9 +209,9 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha: 0.15),
+                        color: Colors.orange.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.orange, width: 1),
+                        border: Border.all(color: Colors.orange, width: 1.5),
                       ),
                       child: Text(
                         movement.bank,
@@ -217,13 +221,21 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
                     const SizedBox(width: 8),
                     Text(
                       'Sugerencia: ${movement.suggestedCategory}',
-                      style: TextStyle(color: GodfatherTheme.primaryGold, fontWeight: FontWeight.w600, fontSize: 14),
+                      style: TextStyle(
+                        color: GodfatherTheme.primaryGold,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ],
                 ),
                 Text(
                   formattedDate,
-                  style: TextStyle(color: GodfatherTheme.textMuted, fontSize: 13),
+                  style: TextStyle(
+                    color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
                 ),
               ],
             ),
@@ -243,13 +255,17 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
                         style: GoogleFonts.inter(
                           color: GodfatherTheme.textLight,
                           fontWeight: FontWeight.bold,
-                          fontSize: 19,
+                          fontSize: 20,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Text(
                         'ID de correo: ${movement.emailMessageId}',
-                        style: TextStyle(color: GodfatherTheme.textMuted, fontSize: 12),
+                        style: TextStyle(
+                          color: GodfatherTheme.isDarkMode ? Colors.white60 : Colors.black54,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -266,7 +282,7 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            const Divider(color: Colors.grey),
+            const Divider(color: Colors.grey, thickness: 1.0),
             const SizedBox(height: 6),
 
             // Título de Aprobación
@@ -274,9 +290,9 @@ class _BcpInboxScreenState extends ConsumerState<BcpInboxScreen> {
               '¿DÓNDE DESEAS REGISTRARLO?',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: GodfatherTheme.textLight.withValues(alpha: 0.8),
+                color: GodfatherTheme.isDarkMode ? Colors.white70 : Colors.black87,
                 fontWeight: FontWeight.bold,
-                fontSize: 14,
+                fontSize: 15,
                 letterSpacing: 1,
               ),
             ),
