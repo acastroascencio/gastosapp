@@ -353,6 +353,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
         concept = "$concept (${_noteController.text.trim()})";
       }
 
+      final selectedFamily = ref.read(selectedFamilyProvider);
       await ref.read(transactionProvider.notifier).updateTransaction(
             id: widget.transaction.id,
             amount: amount,
@@ -360,6 +361,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
             category: finalCategory,
             type: _type,
             target: _target,
+            familyId: _target == TargetModule.casa ? (selectedFamily?.id ?? widget.transaction.familyId) : null,
           );
 
       if (mounted) {

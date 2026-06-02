@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/theme.dart';
 import '../../../core/supabase_service.dart';
+import '../../../core/storage_helper.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
 import 'signup_screen.dart';
 
@@ -21,6 +22,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _rememberEmail = false;
+  bool _keepMeLoggedIn = false;
 
   // Animaciones del Padrino
   late AnimationController _breathingController;
@@ -47,6 +50,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
   @override
   void initState() {
     super.initState();
+    _loadSavedEmail();
 
     // Animación de respiración suave (continua)
     _breathingController = AnimationController(
@@ -73,6 +77,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
         curve: Curves.easeOutBack,
       ),
     );
+  }
+
+  Future<void> _loadSavedEmail() async {
+    final savedEmail = await StorageHelper.getString('remembered_email');
+    final keepLogged = await StorageHelper.getString('keep_me_logged_in') == 'true';
+    if (savedEmail != null) {
+      setState(() {
+        _emailController.text = savedEmail;
+        _rememberEmail = true;
+      });
+    }
+    setState(() {
+      _keepMeLoggedIn = keepLogged;
+    });
   }
 
   @override
@@ -114,9 +132,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
     setState(() => _isLoading = true);
 
     try {
+      final emailStr = _emailController.text.trim();
+      
+      // Save/delete email memory depending on checkbox
+      if (_rememberEmail) {
+        await StorageHelper.saveString('remembered_email', emailStr);
+      } else {
+        await StorageHelper.deleteString('remembered_email');
+      }
+      
+      await StorageHelper.saveString('keep_me_logged_in', _keepMeLoggedIn.toString());
+
       final client = ref.read(supabaseClientProvider);
       await client.auth.signInWithPassword(
-        email: _emailController.text.trim(),
+        email: emailStr,
         password: _passwordController.text,
       );
       if (mounted) {
@@ -389,7 +418,57 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                       return null;
                     },
                   ),
-                  
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Theme(
+                            data: Theme.of(context).copyWith(
+                              unselectedWidgetColor: GodfatherTheme.primaryGold,
+                            ),
+                            child: Checkbox(
+                              value: _rememberEmail,
+                              activeColor: GodfatherTheme.primaryGold,
+                              checkColor: Colors.black,
+                              onChanged: (val) {
+                                setState(() => _rememberEmail = val ?? false);
+                              },
+                            ),
+                          ),
+                          Text(
+                            'Recordar correo',
+                            style: TextStyle(color: GodfatherTheme.textLight, fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Theme(
+                            data: Theme.of(context).copyWith(
+                              unselectedWidgetColor: GodfatherTheme.primaryGold,
+                            ),
+                            child: Checkbox(
+                              value: _keepMeLoggedIn,
+                              activeColor: GodfatherTheme.primaryGold,
+                              checkColor: Colors.black,
+                              onChanged: (val) {
+                                setState(() => _keepMeLoggedIn = val ?? false);
+                              },
+                            ),
+                          ),
+                          Text(
+                            'Mantener sesión',
+                            style: TextStyle(color: GodfatherTheme.textLight, fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
                   // Olvidé mi contraseña
                   Align(
                     alignment: Alignment.centerRight,

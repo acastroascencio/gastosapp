@@ -341,12 +341,14 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         concept = "$concept (${_noteController.text.trim()})";
       }
 
+      final selectedFamily = ref.read(selectedFamilyProvider);
       await ref.read(transactionProvider.notifier).addTransaction(
             amount: amount,
             concept: concept,
             category: finalCategory,
             type: _type,
             target: _target,
+            familyId: _target == TargetModule.casa ? selectedFamily?.id : null,
           );
 
       if (mounted) {
