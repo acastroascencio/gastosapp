@@ -9,7 +9,8 @@ import '../../../core/supabase_service.dart';
 import '../../../models/transaction.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
-  const ReportsScreen({super.key});
+  final DateTime selectedDate;
+  const ReportsScreen({super.key, required this.selectedDate});
 
   @override
   ConsumerState<ReportsScreen> createState() => _ReportsScreenState();
@@ -17,7 +18,6 @@ class ReportsScreen extends ConsumerStatefulWidget {
 
 class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   TargetModule _selectedModule = TargetModule.personal;
-  DateTime _selectedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -30,43 +30,20 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     // Current user id simulation or real
     final currentUserId = currentUser?.id ?? 'guest-user-id';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'INFORME FINANCIERO',
-          style: GoogleFonts.cinzel(
-            color: GodfatherTheme.primaryGold,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
-            fontSize: 24,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(RemixIcons.arrow_left_s_line, size: 28),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              ref.watch(themeModeProvider) == ThemeMode.dark
-                  ? RemixIcons.sun_fill
-                  : RemixIcons.moon_fill,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            'INFORME FINANCIERO',
+            style: GoogleFonts.cinzel(
               color: GodfatherTheme.primaryGold,
-              size: 28,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+              fontSize: 22,
             ),
-            onPressed: () {
-              ref.read(themeModeProvider.notifier).toggleTheme();
-            },
           ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // 1. Selector de Meses Horizontal (ChoiceChips)
-            _buildMonthSelector(),
-            const SizedBox(height: 12),
+        ),
 
             // 2. Selector de Módulo (Personal / Casa-Familia)
             Padding(
@@ -212,8 +189,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                 data: (transactions) {
                   // 1. Filtrar transacciones del mes y año seleccionados
                   final monthFiltered = transactions.where((tx) {
-                    return tx.createdAt.month == _selectedDate.month &&
-                        tx.createdAt.year == _selectedDate.year;
+                    return tx.createdAt.month == widget.selectedDate.month &&
+                        tx.createdAt.year == widget.selectedDate.year;
                   }).toList();
 
                   // 2. Filtrar según módulo con lógica estricta de seguridad
@@ -239,7 +216,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
 
                   if (moduleTransactions.isEmpty) {
                     bodyWidget = Center(
-                      key: ValueKey<String>('empty_${_selectedDate.month}-$_selectedModule'),
+                      key: ValueKey<String>('empty_${widget.selectedDate.month}-$_selectedModule'),
                       child: SingleChildScrollView(
                         child: Padding(
                           padding: const EdgeInsets.all(28.0),
@@ -527,7 +504,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                         const SizedBox(height: 12),
                         ListView.separated(
                           shrinkWrap: true,
-                          physics: isWide ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: moduleTransactions.length,
                           separatorBuilder: (context, index) => Divider(color: GodfatherTheme.borderColor),
                           itemBuilder: (context, index) {
@@ -618,8 +595,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
 
                     bodyWidget = isWide
                         ? Row(
-                            key: ValueKey<String>('wide_${_selectedDate.month}-$_selectedModule-${moduleTransactions.length}'),
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            key: ValueKey<String>('wide_${widget.selectedDate.month}-$_selectedModule-${moduleTransactions.length}'),
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Expanded(
                                 flex: 5,
@@ -639,7 +616,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                             ],
                           )
                         : SingleChildScrollView(
-                            key: ValueKey<String>('narrow_${_selectedDate.month}-$_selectedModule-${moduleTransactions.length}'),
+                            key: ValueKey<String>('narrow_${widget.selectedDate.month}-$_selectedModule-${moduleTransactions.length}'),
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -680,70 +657,6 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  // Selector de meses ChoiceChips horizontal (Igual al Dashboard)
-  Widget _buildMonthSelector() {
-    final List<MapEntry<int, String>> months = const [
-      MapEntry(1, 'Ene'),
-      MapEntry(2, 'Feb'),
-      MapEntry(3, 'Mar'),
-      MapEntry(4, 'Abr'),
-      MapEntry(5, 'May'),
-      MapEntry(6, 'Jun'),
-      MapEntry(7, 'Jul'),
-      MapEntry(8, 'Ago'),
-      MapEntry(9, 'Sep'),
-      MapEntry(10, 'Oct'),
-      MapEntry(11, 'Nov'),
-      MapEntry(12, 'Dic'),
-    ];
-
-    return Container(
-      color: GodfatherTheme.surfaceDark,
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      height: 58,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        itemCount: months.length,
-        itemBuilder: (context, index) {
-          final entry = months[index];
-          final isSelected = _selectedDate.month == entry.key;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6.0),
-            child: ChoiceChip(
-              showCheckmark: false,
-              label: Text(entry.value.toUpperCase()),
-              selected: isSelected,
-              selectedColor: GodfatherTheme.primaryGold.withValues(alpha: 0.25),
-              backgroundColor: GodfatherTheme.surfaceDarkAlt,
-              labelStyle: TextStyle(
-                color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.textLight.withValues(alpha: 0.7),
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-              ),
-              side: BorderSide(
-                color: isSelected ? GodfatherTheme.primaryGold : GodfatherTheme.borderColor,
-                width: isSelected ? 2.0 : 1.0,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              onSelected: (selected) {
-                if (selected) {
-                  setState(() {
-                    _selectedDate = DateTime(_selectedDate.year, entry.key, 1);
-                  });
-                }
-              },
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
+        );
+      }
+    }

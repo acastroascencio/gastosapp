@@ -751,7 +751,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
       case 2:
         return _buildHouseExpensesView(transactions);
       case 3:
-        return const ReportsScreen();
+        return ReportsScreen(selectedDate: _selectedDate);
       default:
         final personalExpenses = transactions
             .where((tx) =>
