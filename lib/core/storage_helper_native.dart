@@ -36,5 +36,7 @@ class StorageHelper {
       await _storage.delete(key: key);
     } catch (_) {}
   }
+
+  static void clearUrlParameters() {}
 }
 

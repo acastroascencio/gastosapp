@@ -270,12 +270,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 20.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                   // Globo de diálogo del Padrino (si se activa al hacer tap)
                   Center(
                     child: AnimatedOpacity(
@@ -662,6 +664,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                 ],
               ),
             ),
+          ),
           ),
         ),
       ),

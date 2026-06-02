@@ -36,5 +36,15 @@ class StorageHelper {
       html.window.localStorage.remove(key);
     } catch (_) {}
   }
+
+  static void clearUrlParameters() {
+    try {
+      final uri = Uri.parse(html.window.location.href);
+      if (uri.queryParameters.isNotEmpty || uri.fragment.isNotEmpty) {
+        final cleanUrl = '${uri.scheme}://${uri.host}${uri.port != 80 && uri.port != 443 && uri.port != 0 ? ":${uri.port}" : ""}${uri.path}';
+        html.window.history.replaceState({}, '', cleanUrl);
+      }
+    } catch (_) {}
+  }
 }
 

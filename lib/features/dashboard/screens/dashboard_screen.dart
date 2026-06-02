@@ -9,6 +9,7 @@ import 'package:remixicon/remixicon.dart';
 import '../../../core/theme.dart';
 import '../../../core/supabase_service.dart';
 import '../../../models/transaction.dart';
+import '../../../core/storage_helper.dart';
 import '../../transactions/widgets/add_transaction_sheet.dart';
 import '../../transactions/widgets/edit_transaction_sheet.dart';
 import '../../reports/screens/reports_screen.dart';
@@ -56,6 +57,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   @override
   void initState() {
     super.initState();
+    StorageHelper.clearUrlParameters();
     _currentGastoImagePath = _gastoImages[0];
     _currentAboneImagePath = _aboneImages[0];
     _updateDateTime();
